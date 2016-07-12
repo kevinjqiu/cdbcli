@@ -3,6 +3,9 @@ import couchdb
 
 import prompt_toolkit as pt
 from prompt_toolkit import history
+from .lexer import lexer
+from .completer import completer
+from .style import style
 
 
 BANNER = """
@@ -37,6 +40,9 @@ class Repl(object):
                 args = {
                     'history': history.InMemoryHistory(),
                     'enable_history_search': True,
+                    'lexer': lexer,
+                    'completer': completer,
+                    'style': style,
                 }
                 cmd = pt.prompt(u"{}> ".format(self.prompt), **args)
                 print('You entered: ', cmd)
