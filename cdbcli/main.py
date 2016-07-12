@@ -47,7 +47,6 @@ class Config(object):
             host=self.__host, port=self.__port, db=self.database)
 
 
-
 @click.command()
 @click.option('-h', '--host', default='localhost', help='The host of the couchdb instance')
 @click.option('--port', default='5984', help='The port of the coouchdb instance')
