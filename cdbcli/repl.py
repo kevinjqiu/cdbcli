@@ -5,13 +5,17 @@ import prompt_toolkit as pt
 from prompt_toolkit import history
 
 
-BANNER = '\n'.join([
-    '  ___  ____  ____   ___  __    ____ ',
-    ' / __)(  _ \(  _ \ / __)(  )  (_  _)',
-    '( (__  )(_) )) _ <( (__  )(__  _)(_ ',
-    ' \___)(____/(____/ \___)(____)(____)',
-])
+BANNER = """
+      ___  ____  ____   ___  __    ____
+     / __)(  _ \(  _ \ / __)(  )  (_  _)
+    ( (__  )(_) )) _ <( (__  )(__  _)(_
+     \___)(____/(____/ \___)(____)(____)
 
+    Welcome to cdbcli
+    CouchDB version: {couchdb_version}
+
+    Enter \h for help
+"""
 
 class Repl(object):
     def __init__(self, couch_server, config):
@@ -24,20 +28,17 @@ class Repl(object):
                                                     host=self._config.host, database=self._config.database)
 
     def _hello(self):
-        message = (
-            BANNER,
-            'Welcome to cdbcli',
-            'CouchDB version: {}'.format(self._couch_server.version()),
-            'Enter \h for help',
-            '',
-            '',
-        )
-        print('\n'.join(message))
+        message = BANNER.format(couchdb_version=self._couch_server.version())
+        print(message)
 
     def _run(self):
         while True:
             try:
-                cmd = pt.prompt(u"{}> ".format(self.prompt), history=history.InMemoryHistory())
+                args = {
+                    'history': history.InMemoryHistory(),
+                    'enable_history_search': True,
+                }
+                cmd = pt.prompt(u"{}> ".format(self.prompt), **args)
                 print('You entered: ', cmd)
             except (EOFError, KeyboardInterrupt):
                 print('Exiting...')
