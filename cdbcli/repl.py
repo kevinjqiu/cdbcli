@@ -5,12 +5,12 @@ import prompt_toolkit as pt
 from prompt_toolkit import history
 
 
-BANNER = '\n'.join(
+BANNER = '\n'.join([
     '  ___  ____  ____   ___  __    ____ ',
     ' / __)(  _ \(  _ \ / __)(  )  (_  _)',
     '( (__  )(_) )) _ <( (__  )(__  _)(_ ',
     ' \___)(____/(____/ \___)(____)(____)',
-)
+])
 
 
 class Repl(object):
@@ -29,6 +29,8 @@ class Repl(object):
             'Welcome to cdbcli',
             'CouchDB version: {}'.format(self._couch_server.version()),
             'Enter \h for help',
+            '',
+            '',
         )
         print('\n'.join(message))
 
