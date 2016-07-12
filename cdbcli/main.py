@@ -15,6 +15,9 @@ class Config(object):
         self.__scheme = 'https' if tls else 'http'
         self.database = database
 
+        if not username and password:
+            self.__username = 'admin'
+
     @property
     def username(self):
         return self.__username
@@ -29,8 +32,13 @@ class Config(object):
 
     @property
     def _cred_string(self):
-        return '' if not self.__username and not self.__password \
-            else '{}:{}@'.format(self.__username, self.__password)
+        if not self.__username and not self.__password:
+            return ''
+
+        if self.__username and not self.__password:
+            return '{}@'.format(self.__username)
+
+        return '{}:{}@'.format(self.__username, self.__password)
 
     @property
     def url(self):
