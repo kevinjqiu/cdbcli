@@ -9,6 +9,8 @@ def _database_name_completer(couch_server, context):
     if status_code != 200:
         raise RuntimeError(response)
 
+    # Need to update WordCompleter so it calls a function to obtain a list of
+    # words rather than a static list
     return WordCompleter(response)
 
 
