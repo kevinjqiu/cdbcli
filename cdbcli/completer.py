@@ -6,4 +6,5 @@ from .commands import COMMANDS
 
 completer = GrammarCompleter(grammar, {
     'command': WordCompleter(COMMANDS.keys()),
+    'database_name': WordCompleter(COMMANDS.keys()),
 })

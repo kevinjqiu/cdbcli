@@ -8,11 +8,6 @@ def _assert_grammar_match(cmd_text, **expected):
         assert m.variables().get(key) == value
 
 
-def test_leading_spaces_are_ignored():
-    cmd_text = '   USE blah'
-    _assert_grammar_match(cmd_text, command='USE', operand='blah')
-
-
-def test_trailing_spaces_are_not_ignored():
-    cmd_text = 'USE blah    '
-    _assert_grammar_match(cmd_text, command='USE', operand='blah    ')
+def test_use_command_parser():
+    cmd_text = 'USE blah'
+    _assert_grammar_match(cmd_text, command='USE', database_name='blah')

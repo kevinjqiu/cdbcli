@@ -8,4 +8,5 @@ from .grammar import grammar
 lexer = GrammarLexer(grammar, lexers={
     'command': SimpleLexer(Token.Command),
     'operand': SimpleLexer(Token.Operand),
+    'database_name': SimpleLexer(Token.Operand),
 })

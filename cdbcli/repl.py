@@ -76,8 +76,8 @@ class Repl(object):
                 if not command in COMMANDS:
                     raise RuntimeError('{} is not a recognized command'.format(command))
 
-                handler = COMMANDS[command]
-                handler(context=self._context, couch_server=self._couch_server, operand=m.variables().get('operand'))
+                handler, _ = COMMANDS[command]
+                handler(context=self._context, couch_server=self._couch_server, variables=m.variables())
             except RuntimeError as e:
                 print(str(e))
             except (EOFError, KeyboardInterrupt):
