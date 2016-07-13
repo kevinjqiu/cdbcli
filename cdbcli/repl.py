@@ -6,6 +6,9 @@ from prompt_toolkit import history
 from .lexer import lexer
 from .completer import completer
 from .style import style
+from .grammar import grammar
+from .commands import COMMANDS
+from .context import Context
 
 
 BANNER = """
@@ -18,17 +21,32 @@ BANNER = """
     CouchDB version: {couchdb_version}
 
     Enter \h for help
+    Press Ctrl+D or Ctrl+C to exit
 """
+
 
 class Repl(object):
     def __init__(self, couch_server, config):
         self._couch_server = couch_server
         self._config = config
+        self._context = Context()
+
+        try:
+            if self._config.database:
+                self._context.current_db = self._couch_server[self._config.database]
+        except couchdb.ResourceNotFound:
+            print("Database '{}' not found".format(self._config.database))
 
     @property
     def prompt(self):
-        return '{username}@{host}{database}'.format(username=self._config.username,
-                                                    host=self._config.host, database=self._config.database)
+        if self._context.current_db:
+            database = '{}'.format(self._context.current_db.name)
+        else:
+            database = ''
+
+        return u'{username}@{host}/{database}> '.format(username=self._config.username,
+                                                       host=self._config.host,
+                                                       database=database)
 
     def _hello(self):
         message = BANNER.format(couchdb_version=self._couch_server.version())
@@ -44,8 +62,24 @@ class Repl(object):
                     'completer': completer,
                     'style': style,
                 }
-                cmd = pt.prompt(u"{}> ".format(self.prompt), **args)
-                print('You entered: ', cmd)
+                cmd_text = pt.prompt(self.prompt, **args).rstrip()
+
+                if not cmd_text:
+                    continue
+
+                m = grammar.match(cmd_text)
+                if not m:
+                    raise RuntimeError('Invalid input')
+
+                command = m.variables().get('command')
+
+                if not command in COMMANDS:
+                    raise RuntimeError('{} is not a recognized command'.format(command))
+
+                handler = COMMANDS[command]
+                handler(context=self._context, couch_server=self._couch_server, operand=m.variables().get('operand'))
+            except RuntimeError as e:
+                print(str(e))
             except (EOFError, KeyboardInterrupt):
                 print('Exiting...')
                 break
