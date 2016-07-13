@@ -4,7 +4,7 @@ import couchdb
 import prompt_toolkit as pt
 from prompt_toolkit import history
 from .lexer import lexer
-from .completer import completer
+from .completer import get_completer
 from .style import style
 from .grammar import grammar
 from .commands import COMMANDS
@@ -59,7 +59,7 @@ class Repl(object):
                     'history': history.InMemoryHistory(),
                     'enable_history_search': True,
                     'lexer': lexer,
-                    'completer': completer,
+                    'completer': get_completer(self._couch_server, self._context),
                     'style': style,
                 }
                 cmd_text = pt.prompt(self.prompt, **args).rstrip()

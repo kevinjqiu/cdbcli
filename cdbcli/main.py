@@ -60,7 +60,6 @@ def main(host, port, username, password, askpass, tls, database):
         password = getpass.getpass('Enter password: ')
 
     config = Config(host, port, username, password, tls, database)
-    print('Connecting to couchdb instance: {}'.format(config.url))
     couch_server = couchdb.Server(config.url)
     r = repl.Repl(couch_server, config)
     r.run()

@@ -4,7 +4,16 @@ from .grammar import grammar
 from .commands import COMMANDS
 
 
-completer = GrammarCompleter(grammar, {
-    'command': WordCompleter(COMMANDS.keys()),
-    'database_name': WordCompleter(COMMANDS.keys()),
-})
+def _database_name_completer(couch_server, context):
+    status_code, _, response = couch_server.resource.get_json('_all_dbs')
+    if status_code != 200:
+        raise RuntimeError(response)
+
+    return WordCompleter(response)
+
+
+def get_completer(couch_server, context):
+    return GrammarCompleter(grammar, {
+        'command': WordCompleter(COMMANDS.keys()),
+        'database_name': _database_name_completer(couch_server, context),
+    })
