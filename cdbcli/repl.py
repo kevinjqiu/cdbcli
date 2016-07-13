@@ -45,8 +45,8 @@ class Repl(object):
             database = ''
 
         return u'{username}@{host}/{database}> '.format(username=self._config.username,
-                                                       host=self._config.host,
-                                                       database=database)
+                                                        host=self._config.host,
+                                                        database=database)
 
     def _hello(self):
         message = BANNER.format(couchdb_version=self._couch_server.version())
@@ -67,13 +67,13 @@ class Repl(object):
                 if not cmd_text:
                     continue
 
-                m = grammar.match(cmd_text)
+                m = grammar.match_prefix(cmd_text)
                 if not m:
                     raise RuntimeError('Invalid input')
 
                 command = m.variables().get('command')
 
-                if not command in COMMANDS:
+                if command not in COMMANDS:
                     raise RuntimeError('{} is not a recognized command'.format(command))
 
                 handler, _ = COMMANDS[command]

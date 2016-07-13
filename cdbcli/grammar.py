@@ -3,8 +3,14 @@ from .commands import COMMANDS
 
 
 def _build_pattern((command, operand_pattern)):
-    return "\s*(?P<command>{command})\s+{operand_pattern}".format(command=command,
-                                                                  operand_pattern=operand_pattern)
+    # compiler tokenizes the pattern, as a result, the space in the pattern
+    # string are stripped out
+    command_pattern = command.replace(' ', '\s')
+    if operand_pattern:
+        return "(\s*(?P<command>{command_pattern})\s+{operand_pattern})".format(command_pattern=command_pattern,
+                                                                                operand_pattern=operand_pattern)
+    else:
+        return "(\s*(?P<command>{command_pattern}))".format(command_pattern=command_pattern)
 
 
 def _create_grammar():
