@@ -8,7 +8,7 @@ setuptools.setup(
     author="Kevin J. Qiu",
     author_email="kevin@idempotent.ca",
 
-    description="couchdb cli",
+    description="Interactive command line shell for CouchDB",
     long_description=open('README.rst').read(),
 
     packages=setuptools.find_packages(),
