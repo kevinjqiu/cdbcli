@@ -17,11 +17,11 @@ def command_handler(command, operand_pattern):
 
 @command_handler('USE', '(?P<database_name>[a-zA-Z0-9_-].*)')
 def cmd_use(context, couch_server, variables):
+    database_name = variables.get('database_name')
     try:
-        database_name = variables.get('database_name')
         if not database_name:
             context.current_db = None
         else:
             context.current_db = couch_server[database_name]
     except couchdb.ResourceNotFound:
-        raise RuntimeError("Database '{}' does not exist".format(operand))
+        raise RuntimeError("Database '{}' does not exist".format(database_name))
