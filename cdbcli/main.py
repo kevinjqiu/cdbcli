@@ -42,9 +42,8 @@ class Config(object):
 
     @property
     def url(self):
-        return '{scheme}://{cred}{host}:{port}/{db}'.format(
-            scheme=self.__scheme, cred=self._cred_string,
-            host=self.__host, port=self.__port, db=self.database)
+        return '{scheme}://{cred}{host}:{port}'.format(
+            scheme=self.__scheme, cred=self._cred_string, host=self.__host, port=self.__port)
 
 
 @click.command()
