@@ -9,5 +9,5 @@ def _assert_grammar_match(cmd_text, **expected):
 
 
 def test_use_command_parser():
-    cmd_text = 'USE blah'
-    _assert_grammar_match(cmd_text, command='USE', database_name='blah')
+    cmd_text = 'cd blah'
+    _assert_grammar_match(cmd_text, command='cd', database_name='blah')
