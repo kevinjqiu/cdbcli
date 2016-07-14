@@ -22,7 +22,7 @@ BANNER = """
     CouchDB version: {couchdb_version}
 
     Press <TAB> for command auto-completion
-    Press Ctrl+D or Ctrl+C to exit
+    Press Ctrl+C or Ctrl+D or type 'exit' to exit
 """
 
 

@@ -14,14 +14,15 @@ The interactive CLI for CouchDB
 Usage
 -----
 
+This tool allows you to traverse a CouchDB database as if it were a file system. Basic file system commands are implemented such as ``ls``, ``cd``
+
 Installation
 ------------
 
+    pip install cdbcli
+
 Requirements
 ^^^^^^^^^^^^
-
-Compatibility
--------------
 
 Licence
 -------

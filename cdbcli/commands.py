@@ -85,3 +85,8 @@ def get(context, couch_server, variables):
     if not doc:
         raise RuntimeError('Document not found')
     print(highlight(doc))
+
+
+@command_handler('exit')
+def exit(context, couch_server, variables):
+    raise EOFError()
