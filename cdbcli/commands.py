@@ -19,6 +19,18 @@ def command_handler(command, operand_pattern=None):
     return decorator
 
 
+def require_current_db(fn):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        assert 'context' in kwargs
+        context = kwargs.get('context')
+        if not context.current_db:
+            raise RuntimeError('No database selected.')
+
+        return fn(*args, **kwargs)
+    return wrapper
+
+
 def highlight(json_object):
     formatted_json = json.dumps(json_object, sort_keys=True, indent=4)
     return pygments.highlight(unicode(formatted_json, 'UTF-8'), lexers.JsonLexer(), formatters.TerminalFormatter())
@@ -37,9 +49,15 @@ def use(context, couch_server, variables):
 
 
 @command_handler('SHOW STATS')
+@require_current_db
 def show_stats(context, couch_server, variables):
-    if not context.current_db:
-        raise RuntimeError('No database selected.')
-
     info = context.current_db.info()
     print(highlight(info))
+
+
+@command_handler('GET', '(?P<doc_id>[^\s]+)')
+@require_current_db
+def get(context, couch_server, variables):
+    doc_id = variables.get('doc_id')
+    doc = context.current_db[doc_id]
+    print(highlight(doc))

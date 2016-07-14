@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 import couchdb
 
 import prompt_toolkit as pt
@@ -20,7 +21,7 @@ BANNER = """
     Welcome to cdbcli
     CouchDB version: {couchdb_version}
 
-    Enter \h for help
+    Press <TAB> for command auto-completion
     Press Ctrl+D or Ctrl+C to exit
 """
 
@@ -40,7 +41,7 @@ class Repl(object):
     @property
     def prompt(self):
         if self._context.current_db:
-            database = '{}'.format(self._context.current_db.name)
+            database = self._context.current_db.name
         else:
             database = ''
 
