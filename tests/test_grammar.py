@@ -8,6 +8,11 @@ def _assert_grammar_match(cmd_text, **expected):
         assert m.variables().get(key) == value
 
 
-def test_use_command_parser():
+def test_cd():
     cmd_text = 'cd blah'
     _assert_grammar_match(cmd_text, command='cd', database_name='blah')
+
+
+def test_cat():
+    cmd_text = 'cat xyz'
+    _assert_grammar_match(cmd_text, command='cat', doc_id='xyz')
