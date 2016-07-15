@@ -9,7 +9,7 @@ from .completer import get_completer
 from .style import style
 from .grammar import grammar
 from .commands import COMMANDS
-from .context import Context
+from .environment import Environment
 
 
 BANNER = """
@@ -30,18 +30,18 @@ class Repl(object):
     def __init__(self, couch_server, config):
         self._couch_server = couch_server
         self._config = config
-        self._context = Context()
+        self._environment = Environment()
 
         try:
             if self._config.database:
-                self._context.current_db = self._couch_server[self._config.database]
+                self._environment.current_db = self._couch_server[self._config.database]
         except couchdb.ResourceNotFound:
             print("Database '{}' not found".format(self._config.database))
 
     @property
     def prompt(self):
-        if self._context.current_db:
-            database = self._context.current_db.name
+        if self._environment.current_db:
+            database = self._environment.current_db.name
         else:
             database = ''
 
@@ -60,7 +60,7 @@ class Repl(object):
                     'history': history.InMemoryHistory(),
                     'enable_history_search': True,
                     'lexer': lexer,
-                    'completer': get_completer(self._couch_server, self._context),
+                    'completer': get_completer(self._couch_server, self._environment),
                     'style': style,
                 }
                 cmd_text = pt.prompt(self.prompt, **args).rstrip()
@@ -78,7 +78,7 @@ class Repl(object):
                     raise RuntimeError('{} is not a recognized command'.format(command))
 
                 handler, _ = COMMANDS[command]
-                handler(context=self._context, couch_server=self._couch_server, variables=m.variables())
+                handler(environment=self._environment, couch_server=self._couch_server, variables=m.variables())
             except RuntimeError as e:
                 print(str(e))
             except (EOFError, KeyboardInterrupt):
