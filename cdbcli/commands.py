@@ -74,7 +74,7 @@ def cd(environment, couch_server, variables):
             pass  # TODO: implement 'previous' database
         else:
             environment.current_db = couch_server[database_name]
-    except couchdb.ResourceNotFound:
+    except (couchdb.ResourceNotFound, couchdb.ServerError):
         raise RuntimeError("Database '{}' does not exist".format(database_name))
 
 
@@ -101,8 +101,12 @@ def cat(environment, couch_server, variables):
 @command_handler('exec', '(?P<view_id>[^\s]+)')
 @require_current_db
 def exec_(environment, couch_server, variables):
-    # TODO: execute a view
-    pass
+    view_id = variables.get('view_id')
+    if not view_id:
+        raise RuntimeError('View not found')
+
+    view_result = environment.current_db.view(view_id)
+    environment.output(list(view_result))
 
 
 @command_handler('exit')
