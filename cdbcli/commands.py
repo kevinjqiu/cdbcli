@@ -45,7 +45,7 @@ def get_all_dbs(environment, couch_server):
     return response
 
 
-def _is_view(doc):
+def is_view(doc):
     return doc.startswith('_design/')
 
 
@@ -60,7 +60,7 @@ def ls(environment, couch_server, variables):
             environment.output('{:>10} {}'.format(info['doc_count'], db_name))
     else:
         for doc in environment.current_db:
-            type_ = 'd' if not _is_view(doc) else 'v'
+            type_ = 'd' if not is_view(doc) else 'v'
             environment.output('{} {}'.format(type_, doc))
 
 
@@ -96,6 +96,13 @@ def cat(environment, couch_server, variables):
     if not doc:
         raise RuntimeError('Document not found')
     environment.output(highlight(doc))
+
+
+@command_handler('exec', '(?P<view_id>[^\s]+)')
+@require_current_db
+def exec_(environment, couch_server, variables):
+    # TODO: execute a view
+    pass
 
 
 @command_handler('exit')
