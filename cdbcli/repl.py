@@ -36,7 +36,7 @@ class Repl(object):
             if self._config.database:
                 self._environment.current_db = self._couch_server[self._config.database]
         except couchdb.ResourceNotFound:
-            print("Database '{}' not found".format(self._config.database))
+            self._environment.output("Database '{}' not found".format(self._config.database))
 
     @property
     def prompt(self):
@@ -51,7 +51,7 @@ class Repl(object):
 
     def _hello(self):
         message = BANNER.format(couchdb_version=self._couch_server.version())
-        print(message)
+        self._environment.output(message)
 
     def _run(self):
         while True:
@@ -80,15 +80,15 @@ class Repl(object):
                 handler, _ = COMMANDS[command]
                 handler(environment=self._environment, couch_server=self._couch_server, variables=m.variables())
             except RuntimeError as e:
-                print(str(e))
+                self._environment.output(str(e))
             except (EOFError, KeyboardInterrupt):
-                print('Exiting...')
+                self._environment.output('Exiting...')
                 break
 
     def run(self):
         try:
             self._hello()
         except couchdb.Unauthorized as e:
-            print('Error connecting to the couchdb instance: {!s}'.format(e))
+            self._environment.output('Error connecting to the couchdb instance: {!s}'.format(e))
         else:
             self._run()

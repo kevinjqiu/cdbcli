@@ -47,10 +47,10 @@ def ls(environment, couch_server, variables):
         for db_name in response:
             db = couch_server[db_name]
             info = db.info()
-            print('{:>10} {}'.format(info['doc_count'], db_name))
+            environment.output('{:>10} {}'.format(info['doc_count'], db_name))
     else:
         for doc in environment.current_db:
-            print(doc)
+            environment.output(doc)
 
 
 @command_handler('cd', '(?P<database_name>[^\s]+)')
@@ -71,7 +71,7 @@ def cd(environment, couch_server, variables):
 @require_current_db
 def info(environment, couch_server, variables):
     info = environment.current_db.info()
-    print(highlight(info))
+    environment.output(highlight(info))
 
 
 @command_handler('cat', '(?P<doc_id>[^\s]+)')
@@ -84,7 +84,7 @@ def get(environment, couch_server, variables):
     doc = environment.current_db.get(doc_id)
     if not doc:
         raise RuntimeError('Document not found')
-    print(highlight(doc))
+    environment.output(highlight(doc))
 
 
 @command_handler('exit')
