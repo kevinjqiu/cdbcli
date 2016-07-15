@@ -82,7 +82,7 @@ def info(environment, couch_server, variables):
 
 @command_handler('cat', '(?P<doc_id>[^\s]+)')
 @require_current_db
-def get(environment, couch_server, variables):
+def cat(environment, couch_server, variables):
     doc_id = variables.get('doc_id')
     if not doc_id:
         raise RuntimeError('Document not found')
