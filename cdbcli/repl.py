@@ -60,7 +60,7 @@ class Repl(object):
                     'history': history.InMemoryHistory(),
                     'enable_history_search': True,
                     'lexer': lexer,
-                    'completer': get_completer(self._couch_server, self._environment),
+                    'completer': get_completer(self._environment, self._couch_server),
                     'style': style,
                 }
                 cmd_text = pt.prompt(self.prompt, **args).rstrip()

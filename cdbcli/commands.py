@@ -36,15 +36,21 @@ def highlight(json_object):
     return pygments.highlight(unicode(formatted_json, 'UTF-8'), lexers.JsonLexer(), formatters.TerminalFormatter())
 
 
+def get_all_dbs(environment, couch_server):
+    status_code, _, response = couch_server.resource.get_json('_all_dbs')
+
+    if status_code != 200:
+        raise RuntimeError(response)
+
+    return response
+
+
 @command_handler('ls')
 def ls(environment, couch_server, variables):
     if environment.current_db is None:
-        status_code, _, response = couch_server.resource.get_json('_all_dbs')
+        all_dbs = get_all_dbs(environment, couch_server)
 
-        if status_code != 200:
-            raise RuntimeError(response)
-
-        for db_name in response:
+        for db_name in all_dbs:
             db = couch_server[db_name]
             info = db.info()
             environment.output('{:>10} {}'.format(info['doc_count'], db_name))
