@@ -45,6 +45,10 @@ def get_all_dbs(environment, couch_server):
     return response
 
 
+def _is_view(doc):
+    return doc.startswith('_design/')
+
+
 @command_handler('ls')
 def ls(environment, couch_server, variables):
     if environment.current_db is None:
@@ -56,7 +60,8 @@ def ls(environment, couch_server, variables):
             environment.output('{:>10} {}'.format(info['doc_count'], db_name))
     else:
         for doc in environment.current_db:
-            environment.output(doc)
+            type_ = 'd' if not _is_view(doc) else 'v'
+            environment.output('{} {}'.format(type_, doc))
 
 
 @command_handler('cd', '(?P<database_name>[^\s]+)')
