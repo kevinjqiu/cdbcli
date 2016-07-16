@@ -105,8 +105,11 @@ def exec_(environment, couch_server, variables):
     if not view_id:
         raise RuntimeError('View not found')
 
-    view_result = environment.current_db.view(view_id)
-    environment.output(list(view_result))
+    try:
+        for result in environment.current_db.view(view_id):
+            environment.output(highlight(dict(result.items())))
+    except:
+        pass
 
 
 @command_handler('exit')

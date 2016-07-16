@@ -24,7 +24,15 @@ def _fetch_view_ids(environment, couch_server):
     if environment.current_db is None:
         return []
 
-    return filter(is_view, list(environment.current_db))
+    paths = []
+    for view_id in filter(is_view, list(environment.current_db)):
+        view_doc = environment.current_db[view_id]
+        paths.extend([
+            '{}/_view/{}'.format(view_id, view_name)
+            for view_name in dict(view_doc.items())['views'].keys()
+        ])
+
+    return paths
 
 def get_completer(environment, couch_server):
     return GrammarCompleter(grammar, {
