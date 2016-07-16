@@ -1,5 +1,6 @@
 import functools
 import json
+import traceback
 
 import couchdb
 import pygments
@@ -109,7 +110,7 @@ def exec_(environment, couch_server, variables):
         for result in environment.current_db.view(view_id):
             environment.output(highlight(dict(result.items())))
     except:
-        pass
+        traceback.print_exc()
 
 
 @command_handler('exit')
