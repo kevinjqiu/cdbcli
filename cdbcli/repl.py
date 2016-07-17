@@ -26,6 +26,23 @@ BANNER = """
 """
 
 
+def eval_(environment, couch_server, command_text):
+    if not command_text:
+        continue
+
+    m = grammar.match_prefix(command_text)
+    if not m:
+        raise RuntimeError('Invalid input')
+
+    command = m.variables().get('command')
+
+    if command not in COMMANDS:
+        raise RuntimeError('{} is not a recognized command'.format(command))
+
+    handler, _ = COMMANDS[command]
+    handler(environment=environment, couch_server=couch_server, variables=m.variables())
+
+
 class Repl(object):
     def __init__(self, couch_server, config):
         self._couch_server = couch_server
@@ -65,20 +82,7 @@ class Repl(object):
                 }
                 cmd_text = pt.prompt(self.prompt, **args).rstrip()
 
-                if not cmd_text:
-                    continue
-
-                m = grammar.match_prefix(cmd_text)
-                if not m:
-                    raise RuntimeError('Invalid input')
-
-                command = m.variables().get('command')
-
-                if command not in COMMANDS:
-                    raise RuntimeError('{} is not a recognized command'.format(command))
-
-                handler, _ = COMMANDS[command]
-                handler(environment=self._environment, couch_server=self._couch_server, variables=m.variables())
+                eval_(self._environment, self._couch_server, cmd_text)
             except RuntimeError as e:
                 self._environment.output(str(e))
             except (EOFError, KeyboardInterrupt):
