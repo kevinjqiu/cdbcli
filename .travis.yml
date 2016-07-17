@@ -5,4 +5,8 @@ language: python
 env:
     - TOXENV=py27
 install: pip install tox
+before_script:
+    .travis/run-couchdb.sh
 script: tox
+after_script:
+    .travis/stop-couchdb.sh
