@@ -28,7 +28,7 @@ BANNER = """
 
 def eval_(environment, couch_server, command_text):
     if not command_text:
-        continue
+        return
 
     m = grammar.match_prefix(command_text)
     if not m:
