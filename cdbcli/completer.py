@@ -34,6 +34,7 @@ def _fetch_view_ids(environment, couch_server):
 
     return paths
 
+
 def get_completer(environment, couch_server):
     return GrammarCompleter(grammar, {
         'command': WordCompleter(COMMANDS.keys()),

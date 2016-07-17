@@ -96,6 +96,7 @@ def cat(environment, couch_server, variables):
     doc = environment.current_db.get(doc_id)
     if not doc:
         raise RuntimeError('Document not found')
+
     environment.output(highlight(doc))
 
 
