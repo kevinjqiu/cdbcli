@@ -29,6 +29,16 @@ def test_ls_shows_all_dbs_if_no_current_db(environment, couch_server):
     assert '_replicator' in output[0]
     assert '_users' in output[1]
 
+
+def test_ls_shows_no_doc_if_no_doc(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    eval_(environment, couch_server, 'ls')
+    assert environment.current_db is db
+    output = _get_output(environment).splitlines()
+    assert 0 == len(output)
+
+
 def test_ls_shows_all_docs_if_current_db_is_set(environment, couch_server):
     db = couch_server.create('test')
     docs = [db.save({}) for _ in xrange(10)]
