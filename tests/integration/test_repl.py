@@ -75,12 +75,22 @@ def test_ls_shows_no_doc_if_no_doc(environment, couch_server):
 
 def test_ls_shows_all_docs_if_current_db_is_set(environment, couch_server):
     db = couch_server.create('test')
-    docs = [db.save({}) for _ in xrange(10)]
+    docs = [db.save(get_user_doc(first_name, last_name))
+            for first_name, last_name in [
+                ('george', 'washington'),
+                ('thomas', 'jefferson'),
+                ('john', 'adams'),
+            ]]
+    db.save(get_user_design_doc())
     environment.current_db = db
     eval_(environment, couch_server, 'ls')
     assert environment.current_db is db
     output = _get_output(environment).splitlines()
-    assert 10 == len(output)
+    expected = set(['v _design/users',
+                    'd george.washington',
+                    'd thomas.jefferson',
+                    'd john.adams'])
+    assert expected == set(output)
 
 
 def test_cat_raises_error_when_no_docid_specified(environment, couch_server):
