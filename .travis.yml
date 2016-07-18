@@ -6,7 +6,7 @@ env:
     - TOXENV=py27
 install: pip install tox
 before_script:
-    .travis/run-couchdb.sh
+    make start_couchdb 
 script: tox
 after_script:
-    .travis/stop-couchdb.sh
+    make stop_couchdb
