@@ -1,7 +1,7 @@
 .PHONY: tests
 
 start_couchdb:
-	.travis/run-couchdb.sh
+	.travis/start-couchdb.sh
 
 stop_couchdb:
 	.travis/stop-couchdb.sh
