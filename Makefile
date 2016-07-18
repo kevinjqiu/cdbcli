@@ -6,5 +6,5 @@ start_couchdb:
 stop_couchdb:
 	.travis/stop-couchdb.sh
 
-tests:
+test:
 	py.test --cov=cdbcli --cov=tests --cov-report term-missing tests
