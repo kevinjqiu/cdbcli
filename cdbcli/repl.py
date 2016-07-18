@@ -37,7 +37,7 @@ def eval_(environment, couch_server, command_text):
     command = m.variables().get('command')
 
     if command not in COMMANDS:
-        raise RuntimeError('{} is not a recognized command'.format(command))
+        raise RuntimeError('{}: command not found'.format(command_text))
 
     handler, _ = COMMANDS[command]
     handler(environment=environment, couch_server=couch_server, variables=m.variables())
