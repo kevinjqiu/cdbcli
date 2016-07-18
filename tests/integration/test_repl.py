@@ -33,6 +33,28 @@ def test_cd_changes_current_db_in_environment(environment, couch_server):
     assert environment.current_db.name == 'test'
 
 
+def test_cd_dotdot_change_to_root_dir(environment, couch_server):
+    environment.current_db = couch_server.create('test')
+    eval_(environment, couch_server, 'cd ..')
+    assert environment.current_db is None
+
+
+def test_cd_slash_change_to_root_dir(environment, couch_server):
+    environment.current_db = couch_server.create('test')
+    eval_(environment, couch_server, 'cd /')
+    assert environment.current_db is None
+
+
+def test_cd_dotdot_does_not_change_db_if_already_root(environment, couch_server):
+    eval_(environment, couch_server, 'cd ..')
+    assert environment.current_db is None
+
+
+def test_cd_slash_does_not_change_db_if_already_root(environment, couch_server):
+    eval_(environment, couch_server, 'cd /')
+    assert environment.current_db is None
+
+
 def test_ls_shows_all_dbs_if_no_current_db(environment, couch_server):
     eval_(environment, couch_server, 'ls')
     assert environment.current_db is None
@@ -86,3 +108,8 @@ def test_cat_shows_doc_content(environment, couch_server):
     eval_(environment, couch_server, 'cat {}'.format(doc_id))
     output = _get_output(environment)
     assert doc_id in output
+
+
+def test_exit_raises_eof_error(environment, couch_server):
+    with pytest.raises(EOFError):
+        eval_(environment, couch_server, 'exit')
