@@ -79,7 +79,7 @@ def test_cat_raises_error_when_no_doc_matching_id(environment, couch_server):
         eval_(environment, couch_server, 'cat cafebabe')
 
 
-def test_cat_raises_error_when_no_doc_matching_id(environment, couch_server):
+def test_cat_shows_doc_content(environment, couch_server):
     db = couch_server.create('test')
     doc_id, _ = db.save({})
     environment.current_db = db
