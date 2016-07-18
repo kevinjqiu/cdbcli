@@ -10,6 +10,18 @@ def _get_output(environment):
     return environment.output_stream.read()
 
 
+def test_info_command_raises_error_when_no_current_db(environment, couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'info')
+
+
+def test_info_command_show_db_stats(environment, couch_server):
+    environment.current_db = couch_server.create('test')
+    eval_(environment, couch_server, 'info')
+    output = _get_output(environment)
+    assert 'doc_count' in output
+
+
 def test_cd_on_nonexistent_db_raises_error(environment, couch_server):
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'cd test')
