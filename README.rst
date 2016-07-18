@@ -19,6 +19,8 @@ This tool allows you to traverse a CouchDB database as if it were a file system.
 Installation
 ------------
 
+.. code::
+
     pip install cdbcli
 
 Requirements
