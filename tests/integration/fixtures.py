@@ -25,7 +25,6 @@ def couch_server():
     return couch_server
 
 
-
 def get_user_doc(first_name=None, last_name=None):
     first_name = first_name or uuid.uuid4().hex
     last_name = last_name or uuid.uuid4().hex
