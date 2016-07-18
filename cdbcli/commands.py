@@ -65,7 +65,7 @@ def ls(environment, couch_server, variables):
             environment.output('{} {}'.format(type_, doc))
 
 
-@command_handler('cd', '(?P<database_name>[^\s]+)')
+@command_handler('cd', '(?P<database_name>[a-zA-Z0-9-_./]+)')
 def cd(environment, couch_server, variables):
     database_name = variables.get('database_name')
     try:
@@ -112,6 +112,20 @@ def exec_(environment, couch_server, variables):
             environment.output(highlight(dict(result.items())))
     except:
         traceback.print_exc()
+
+
+@command_handler('mkdir', '(?P<database_name>[a-zA-Z0-9-_]+)')
+def mkdir(environment, couch_server, variables):
+    if environment.current_db is not None:
+        raise RuntimeError('You can only create databases from /')
+
+    database_name = variables.get('database_name')
+
+    if database_name in couch_server:
+        raise RuntimeError('Database {} already exists'.format(database_name))
+
+    couch_server.create(database_name)
+    environment.output('{} was created'.format(database_name))
 
 
 @command_handler('exit')

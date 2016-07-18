@@ -1,7 +1,6 @@
 import pytest
 
 from cdbcli.repl import eval_
-from cdbcli.environment import Environment
 from fixtures import *  # noqa
 
 
@@ -75,12 +74,11 @@ def test_ls_shows_no_doc_if_no_doc(environment, couch_server):
 
 def test_ls_shows_all_docs_if_current_db_is_set(environment, couch_server):
     db = couch_server.create('test')
-    docs = [db.save(get_user_doc(first_name, last_name))
-            for first_name, last_name in [
-                ('george', 'washington'),
-                ('thomas', 'jefferson'),
-                ('john', 'adams'),
-            ]]
+    [db.save(get_user_doc(first_name, last_name))
+     for first_name, last_name in [('george', 'washington'),
+                                   ('thomas', 'jefferson'),
+                                   ('john', 'adams')]
+     ]
     db.save(get_user_design_doc())
     environment.current_db = db
     eval_(environment, couch_server, 'ls')
@@ -123,3 +121,20 @@ def test_cat_shows_doc_content(environment, couch_server):
 def test_exit_raises_eof_error(environment, couch_server):
     with pytest.raises(EOFError):
         eval_(environment, couch_server, 'exit')
+
+
+def test_mkdir_raises_error_when_db_already_exists(environment, couch_server):
+    couch_server.create('test')
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'mkdir test')
+
+
+def test_mkdir_raises_error_when_creating_db_inside_a_db(environment, couch_server):
+    environment.current_db = couch_server.create('test')
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'mkdir test_1')
+
+
+def test_mkdir_creates_new_database(environment, couch_server):
+    eval_(environment, couch_server, 'mkdir test')
+    assert couch_server['test'] is not None
