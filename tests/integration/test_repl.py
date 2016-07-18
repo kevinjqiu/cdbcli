@@ -138,3 +138,5 @@ def test_mkdir_raises_error_when_creating_db_inside_a_db(environment, couch_serv
 def test_mkdir_creates_new_database(environment, couch_server):
     eval_(environment, couch_server, 'mkdir test')
     assert couch_server['test'] is not None
+    output = _get_output(environment)
+    assert 'Created test' in output

@@ -125,7 +125,7 @@ def mkdir(environment, couch_server, variables):
         raise RuntimeError('Database {} already exists'.format(database_name))
 
     couch_server.create(database_name)
-    environment.output('{} was created'.format(database_name))
+    environment.output('Created {}'.format(database_name))
 
 
 @command_handler('exit')
