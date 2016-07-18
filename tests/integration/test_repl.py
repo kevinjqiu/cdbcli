@@ -59,3 +59,30 @@ def test_ls_shows_all_docs_if_current_db_is_set(environment, couch_server):
     assert environment.current_db is db
     output = _get_output(environment).splitlines()
     assert 10 == len(output)
+
+
+def test_cat_raises_error_when_no_docid_specified(environment, couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'cat')
+
+
+def test_cat_raises_error_when_no_current_db_selected(environment, couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'cat cafebabe')
+
+
+def test_cat_raises_error_when_no_doc_matching_id(environment, couch_server):
+    db = couch_server.create('test')
+    doc_id, _ = db.save({})
+    environment.current_db = db
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'cat cafebabe')
+
+
+def test_cat_raises_error_when_no_doc_matching_id(environment, couch_server):
+    db = couch_server.create('test')
+    doc_id, _ = db.save({})
+    environment.current_db = db
+    eval_(environment, couch_server, 'cat {}'.format(doc_id))
+    output = _get_output(environment)
+    assert doc_id in output
