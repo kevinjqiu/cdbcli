@@ -83,8 +83,17 @@ Installation
 
     pip install cdbcli
 
-Requirements
-^^^^^^^^^^^^
+
+Contributing
+------------
+
+* Clone this repository.
+* Make a Python virtualenv
+* Install requirements: ``pip install -r requirements-test.txt``
+* Install `docker<www.docker.com>`_ because the integration tests require it
+* Run ``make start_couchdb``. This will start the testing couchdb instance using docker
+* Run ``make test``
+* Run ``make stop_couchdb`` to clean up
 
 Licence
 -------
