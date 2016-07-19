@@ -37,6 +37,14 @@ def highlight(json_object):
     return pygments.highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
 
 
+def highlight_javascript(code):
+    pass
+
+
+def highlight_python(code):
+    pass
+
+
 def get_all_dbs(environment, couch_server):
     status_code, _, response = couch_server.resource.get_json('_all_dbs')
 
@@ -127,6 +135,24 @@ def mkdir(environment, couch_server, variables):
 
     couch_server.create(database_name)
     environment.output('Created {}'.format(database_name))
+
+
+@command_handler('lv', '(?P<view_doc_id>[a-zA-Z0-9-_/]+)')
+@require_current_db
+def lv(environment, couch_server, variables):
+    view_doc_id = variables['view_doc_id']
+    if view_doc_id not in environment.current_db:
+        raise RuntimeError('{} not found'.format(view_doc_id))
+
+    view_doc = environment.current_db[view_doc_id]
+    language = view_doc.get('language', 'javascript')
+    views = view_doc.get('views')
+    for view_name, view_funcs in views.items():
+        environment.output('{}:{}'.format(view_doc_id, view_name))
+        map_func = view_funcs.get('map', '')
+        reduce_func = view_funcs.get('reduce', '')
+        environment.output(map_func)
+        environment.output(reduce_func)
 
 
 @command_handler('exit')

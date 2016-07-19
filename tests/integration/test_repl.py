@@ -184,3 +184,23 @@ def test_exec_view(environment, couch_server, mocker):
     expected = set(['washington', 'jefferson', 'adams'])
     actual = set([x['key'] for x in highlighted])
     assert expected == actual
+
+
+def test_lv_requires_current_db(environment, couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'lv blah')
+
+
+def test_lv_requires_real_view_doc_id(environment, couch_server):
+    db = couch_server.create('test')
+    db.save(get_user_design_doc())
+    environment.current_db = db
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'lv _design/blah')
+
+
+def test_lv_lists_views_inside_view_doc(environment, couch_server):
+    db = couch_server.create('test')
+    db.save(get_user_design_doc())
+    environment.current_db = db
+    eval_(environment, couch_server, 'lv _design/users')
