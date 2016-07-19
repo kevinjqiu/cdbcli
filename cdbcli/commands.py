@@ -38,11 +38,11 @@ def highlight(json_object):
 
 
 def highlight_javascript(code):
-    pass
+    return pygments.highlight(code, lexers.JavascriptLexer(), formatters.TerminalFormatter())
 
 
 def highlight_python(code):
-    pass
+    return pygments.highlight(code, lexers.PythonLexer(), formatters.TerminalFormatter())
 
 
 def get_all_dbs(environment, couch_server):
