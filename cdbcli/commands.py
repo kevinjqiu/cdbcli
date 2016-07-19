@@ -112,6 +112,7 @@ def exec_(environment, couch_server, variables):
             environment.output(highlight(dict(result.items())))
     except:
         traceback.print_exc()
+        raise RuntimeError('Unable to exec view: {}'.format(view_id))
 
 
 @command_handler('mkdir', '(?P<database_name>[a-zA-Z0-9-_]+)')

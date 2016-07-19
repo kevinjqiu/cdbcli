@@ -9,6 +9,20 @@ def _get_output(environment):
     return environment.output_stream.read()
 
 
+def _get_mock_highlight(mocker):
+    mock_highlight = mocker.patch('cdbcli.commands.highlight')
+    mock_highlight.return_value = ''
+    return mock_highlight
+
+
+def _get_highlighted(mock_highlight):
+    args = [
+        c[0][0]
+        for c in mock_highlight.call_args_list
+    ]
+    return args
+
+
 def test_info_command_raises_error_when_no_current_db(environment, couch_server):
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'info')
@@ -140,3 +154,33 @@ def test_mkdir_creates_new_database(environment, couch_server):
     assert couch_server['test'] is not None
     output = _get_output(environment)
     assert 'Created test' in output
+
+
+def test_exec_requires_current_db(environment, couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'exec blah')
+
+
+def test_exec_view_does_not_exist(environment, couch_server):
+    db = couch_server.create('test')
+    db.save(get_user_design_doc())
+    environment.current_db = db
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'exec _design/users')
+
+
+def test_exec_view(environment, couch_server, mocker):
+    db = couch_server.create('test')
+    [db.save(get_user_doc(first_name, last_name))
+     for first_name, last_name in [('george', 'washington'),
+                                   ('thomas', 'jefferson'),
+                                   ('john', 'adams')]
+     ]
+    db.save(get_user_design_doc())
+    environment.current_db = db
+    mock_highlight = _get_mock_highlight(mocker)
+    eval_(environment, couch_server, 'exec _design/users/_view/by_lastname')
+    highlighted = _get_highlighted(mock_highlight)
+    expected = set(['washington', 'jefferson', 'adams'])
+    actual = set([x['key'] for x in highlighted])
+    assert expected == actual
