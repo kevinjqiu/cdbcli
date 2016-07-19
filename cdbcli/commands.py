@@ -5,17 +5,21 @@ import traceback
 import couchdb
 import pygments
 from pygments import lexers, formatters
+from collections import namedtuple
 
 
 COMMANDS = {}
 
 
-def command_handler(command, operand_pattern=None):
+Command = namedtuple('Command', ['handler', 'pattern', 'help'])
+
+
+def command_handler(command, pattern=None, help=None):
     def decorator(fn):
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
             return fn(*args, **kwargs)
-        COMMANDS[command] = (wrapper, operand_pattern)
+        COMMANDS[command] = Command(wrapper, pattern, help)
         return wrapper
     return decorator
 

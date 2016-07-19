@@ -17,7 +17,7 @@ def _build_pattern(args):
 def _create_grammar():
     patterns = map(_build_pattern, [
         (command, operand_pattern)
-        for (command, (_, operand_pattern)) in COMMANDS.items()])
+        for (command, (_, operand_pattern, _)) in COMMANDS.items()])
     patterns = '|'.join(patterns)
     return compiler.compile(patterns)
 
