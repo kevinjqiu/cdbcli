@@ -63,10 +63,10 @@ You will be greeted by the cdbcli's splash screen::
     admin@yourdomain/>
 
 
-Change database
-^^^^^^^^^^^^^^^
+``cd <database>``
+^^^^^^^^^^^^^^^^^
 
-In cdbcli, change database is achieved by using the ``cd`` command::
+Change database is achieved by using the ``cd`` command::
 
     admin@yourdomain/> cd test
     admin@yourdomain/test>
