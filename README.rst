@@ -14,7 +14,7 @@ The interactive CLI for CouchDB
 Usage
 -----
 
-This tool allows you to traverse a CouchDB database as if it were a file system. Familiar file system commands are supported, such as ``ls``, ``cd``, ``mkdir``, ``rm``, etc.
+This tool allows you to traverse a CouchDB database as if it were a file system. Familiar file system commands are supported, such as ``ls``, ``cd``, ``mkdir``, ``rm``, etc, while providing context-rich auto-completion.
 
 Starting cdbcli
 ^^^^^^^^^^^^^^^
@@ -60,7 +60,21 @@ You will be greeted by the cdbcli's splash screen::
         Press <TAB> for command auto-completion
         Press Ctrl+C or Ctrl+D or type 'exit' to exit
 
-    admin@www.idempotent.ca/>
+    admin@yourdomain/>
+
+
+Change database
+^^^^^^^^^^^^^^^
+
+In cdbcli, change database is achieved by using the ``cd`` command::
+
+    admin@yourdomain/> cd test
+    admin@yourdomain/test>
+
+Use ``cd ..`` or ``cd /`` to go back to the root of the database::
+
+    admin@yourdomain/test> cd /
+    admin@yourdomain/>
 
 Installation
 ------------
