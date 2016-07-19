@@ -9,8 +9,8 @@ def _get_output(environment):
     return environment.output_stream.read()
 
 
-def _get_mock_highlight(mocker):
-    mock_highlight = mocker.patch('cdbcli.commands.highlight')
+def _get_mock_highlight_json(mocker):
+    mock_highlight = mocker.patch('cdbcli.commands.highlight_json')
     mock_highlight.return_value = ''
     return mock_highlight
 
@@ -178,7 +178,7 @@ def test_exec_view(environment, couch_server, mocker):
      ]
     db.save(get_user_design_doc())
     environment.current_db = db
-    mock_highlight = _get_mock_highlight(mocker)
+    mock_highlight = _get_mock_highlight_json(mocker)
     eval_(environment, couch_server, 'exec _design/users/_view/by_lastname')
     highlighted = _get_highlighted(mock_highlight)
     expected = set(['washington', 'jefferson', 'adams'])
@@ -204,3 +204,4 @@ def test_lv_lists_views_inside_view_doc(environment, couch_server):
     db.save(get_user_design_doc())
     environment.current_db = db
     eval_(environment, couch_server, 'lv _design/users')
+    # assert map function is displayed

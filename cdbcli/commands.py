@@ -32,7 +32,7 @@ def require_current_db(fn):
     return wrapper
 
 
-def highlight(json_object):
+def highlight_json(json_object):
     formatted_json = json.dumps(json_object, sort_keys=True, indent=4)
     return pygments.highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
 
@@ -91,7 +91,7 @@ def cd(environment, couch_server, variables):
 @require_current_db
 def info(environment, couch_server, variables):
     info = environment.current_db.info()
-    environment.output(highlight(info))
+    environment.output(highlight_json(info))
 
 
 @command_handler('cat', '(?P<doc_id>[^\s]+)')
@@ -105,7 +105,7 @@ def cat(environment, couch_server, variables):
     if not doc:
         raise RuntimeError('Document not found')
 
-    environment.output(highlight(doc))
+    environment.output(highlight_json(doc))
 
 
 @command_handler('exec', '(?P<view_id>[^\s]+)')
@@ -117,7 +117,7 @@ def exec_(environment, couch_server, variables):
 
     try:
         for result in environment.current_db.view(view_id):
-            environment.output(highlight(dict(result.items())))
+            environment.output(highlight_json(dict(result.items())))
     except:
         traceback.print_exc()
         raise RuntimeError('Unable to exec view: {}'.format(view_id))
@@ -146,13 +146,19 @@ def lv(environment, couch_server, variables):
 
     view_doc = environment.current_db[view_doc_id]
     language = view_doc.get('language', 'javascript')
+
+    highlighter = {
+        'python': highlight_python,
+        'javascript': highlight_javascript,
+    }.get(language, lambda x: x)
+
     views = view_doc.get('views')
     for view_name, view_funcs in views.items():
         environment.output('{}:{}'.format(view_doc_id, view_name))
         map_func = view_funcs.get('map', '')
         reduce_func = view_funcs.get('reduce', '')
-        environment.output(map_func)
-        environment.output(reduce_func)
+        environment.output(highlighter(map_func))
+        environment.output(highlighter(reduce_func))
 
 
 @command_handler('exit')
