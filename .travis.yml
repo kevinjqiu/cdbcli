@@ -10,3 +10,5 @@ before_script:
 script: tox
 after_script:
     make stop_couchdb
+after_success:
+    coveralls
