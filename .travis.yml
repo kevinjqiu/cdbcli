@@ -3,7 +3,7 @@ services:
     - docker
 language: python
 env:
-    - TOXENV=py27
+    - TOXENV=py35
 install: pip install tox
 before_script:
     make start_couchdb 

@@ -1,7 +1,7 @@
 import pytest
 
 from cdbcli.repl import eval_
-from fixtures import *  # noqa
+from tests.integration.fixtures import *  # noqa
 
 
 def _get_output(environment):

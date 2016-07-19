@@ -3,7 +3,7 @@ import getpass
 import couchdb
 import click
 
-import repl
+from cdbcli import repl
 
 
 class Config(object):
