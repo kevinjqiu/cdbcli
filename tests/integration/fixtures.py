@@ -2,7 +2,7 @@ import uuid
 import couchdb
 import pytest
 
-from cStringIO import StringIO
+from io import StringIO
 from cdbcli.environment import Environment
 
 

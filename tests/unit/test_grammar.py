@@ -4,7 +4,7 @@ from cdbcli.grammar import grammar
 def _assert_grammar_match(cmd_text, **expected):
     m = grammar.match(cmd_text)
     assert m is not None
-    for key, value in expected.iteritems():
+    for key, value in expected.items():
         assert m.variables().get(key) == value
 
 

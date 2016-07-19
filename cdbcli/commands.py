@@ -34,7 +34,7 @@ def require_current_db(fn):
 
 def highlight(json_object):
     formatted_json = json.dumps(json_object, sort_keys=True, indent=4)
-    return pygments.highlight(unicode(formatted_json, 'UTF-8'), lexers.JsonLexer(), formatters.TerminalFormatter())
+    return pygments.highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
 
 
 def get_all_dbs(environment, couch_server):
