@@ -91,14 +91,15 @@ def cd(environment, couch_server, variables):
         raise RuntimeError("Database '{}' does not exist".format(database_name))
 
 
-@command_handler('info')
+@command_handler('info', help='info\n\nShow the information of the current database')
 @require_current_db
 def info(environment, couch_server, variables):
     info = environment.current_db.info()
     environment.output(highlight_json(info))
 
 
-@command_handler('cat', '(?P<doc_id>[^\s]+)')
+@command_handler('cat', '(?P<doc_id>[^\s]+)', help=('cat <doc_id>\n\n'
+                                                    'Show the content of a document by its id'))
 @require_current_db
 def cat(environment, couch_server, variables):
     doc_id = variables.get('doc_id')
@@ -112,7 +113,8 @@ def cat(environment, couch_server, variables):
     environment.output(highlight_json(doc))
 
 
-@command_handler('exec', '(?P<view_id>[^\s]+)')
+@command_handler('exec', '(?P<view_id>[^\s]+)', help=('exec <view_path>\n\n'
+                                                      'Execute the view given the full view path\n'))
 @require_current_db
 def exec_(environment, couch_server, variables):
     view_id = variables.get('view_id')
@@ -127,7 +129,8 @@ def exec_(environment, couch_server, variables):
         raise RuntimeError('Unable to exec view: {}'.format(view_id))
 
 
-@command_handler('mkdir', '(?P<database_name>[a-zA-Z0-9-_]+)')
+@command_handler('mkdir', '(?P<database_name>[a-zA-Z0-9-_]+)', help=('mkdir <dbname>\n\n'
+                                                                     'Create a database'))
 def mkdir(environment, couch_server, variables):
     if environment.current_db is not None:
         raise RuntimeError('You can only create databases from /')
@@ -141,7 +144,8 @@ def mkdir(environment, couch_server, variables):
     environment.output('Created {}'.format(database_name))
 
 
-@command_handler('lv', '(?P<view_doc_id>[a-zA-Z0-9-_/]+)')
+@command_handler('lv', '(?P<view_doc_id>[a-zA-Z0-9-_/]+)', help=('lv <view_doc_id>\n\n'
+                                                                 'Show the views inside the view document'))
 @require_current_db
 def lv(environment, couch_server, variables):
     view_doc_id = variables['view_doc_id']
@@ -176,7 +180,9 @@ def man(environment, couch_server, variables):
         environment.output('No manual entry for {}'.format(command))
         return
 
+    environment.output('')
     environment.output(command_handler.help)
+    environment.output('')
 
 
 @command_handler('exit')
