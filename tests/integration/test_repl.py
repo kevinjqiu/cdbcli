@@ -1,6 +1,7 @@
 import pytest
 
 from cdbcli.repl import eval_
+from cdbcli.commands import command_handler
 from tests.integration.fixtures import *  # noqa
 
 
@@ -205,3 +206,28 @@ def test_lv_lists_views_inside_view_doc(environment, couch_server):
     environment.current_db = db
     eval_(environment, couch_server, 'lv _design/users')
     # assert map function is displayed
+
+
+def test_man_unrecognized_command(environment, couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'man xyz')
+
+
+def test_man_command_has_no_help(environment, couch_server):
+    @command_handler('xyz')
+    def xyz(*args, **kwargs):
+        pass
+
+    eval_(environment, couch_server, 'man xyz')
+    output = _get_output(environment)
+    assert 'No manual entry for xyz' == output.strip()
+
+
+def test_man_command_has_help(environment, couch_server):
+    @command_handler('xyz', '', help='Blah blah')
+    def xyz(*args, **kwargs):
+        pass
+
+    eval_(environment, couch_server, 'man xyz')
+    output = _get_output(environment)
+    assert 'Blah blah' == output.strip()

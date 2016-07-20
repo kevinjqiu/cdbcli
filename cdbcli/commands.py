@@ -165,6 +165,20 @@ def lv(environment, couch_server, variables):
         environment.output(highlighter(reduce_func))
 
 
+@command_handler('man', pattern='(?P<target>[a-zA-Z0-9-_]+)', help='Show help for command')
+def man(environment, couch_server, variables):
+    command = variables.get('target')
+    command_handler = COMMANDS.get(command)
+    if not command_handler:
+        raise RuntimeError('Command {} not recognized'.format(command))
+
+    if not command_handler.help:
+        environment.output('No manual entry for {}'.format(command))
+        return
+
+    environment.output(command_handler.help)
+
+
 @command_handler('exit')
 def exit(environment, couch_server, variables):
     raise EOFError()
