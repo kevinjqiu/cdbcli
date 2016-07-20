@@ -114,16 +114,16 @@ def cat(environment, couch_server, variables):
     environment.output(highlight_json(doc))
 
 
-@command_handler('exec', '(?P<view_id>[^\s]+)', help=('exec <view_path>\n\n'
-                                                      'Execute the view given the full view path\n'))
+@command_handler('exec', '(?P<view_path>[^\s]+)', help=('exec <view_path>\n\n'
+                                                        'Execute the view given the full view path\n'))
 @require_current_db
 def exec_(environment, couch_server, variables):
-    view_id = variables.get('view_id')
+    view_id, view_name = variables.get('view_path').split(':')
     if not view_id:
         raise RuntimeError('View not found')
 
     try:
-        for result in environment.current_db.view(view_id):
+        for result in environment.current_db.view('{}/_view/{}'.format(view_id, view_name)):
             environment.output(highlight_json(dict(result.items())))
     except:
         traceback.print_exc()
