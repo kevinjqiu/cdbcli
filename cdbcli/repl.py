@@ -62,9 +62,9 @@ class Repl(object):
         else:
             database = ''
 
-        return u'{username}@{host}/{database}> '.format(username=self._config.username,
-                                                        host=self._config.host,
-                                                        database=database)
+        return '{username}@{host}/{database}> '.format(username=self._config.username,
+                                                       host=self._config.host,
+                                                       database=database)
 
     def _hello(self):
         message = BANNER.format(couchdb_version=self._couch_server.version())
