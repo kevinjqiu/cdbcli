@@ -62,7 +62,7 @@ def is_view(doc):
     return doc.startswith('_design/')
 
 
-@command_handler('ls')
+@command_handler('ls', help='ls\n\nShow the documents in the current database')
 def ls(environment, couch_server, variables):
     if environment.current_db is None:
         all_dbs = get_all_dbs(environment, couch_server)
@@ -77,7 +77,8 @@ def ls(environment, couch_server, variables):
             environment.output('{} {}'.format(type_, doc))
 
 
-@command_handler('cd', '(?P<database_name>[a-zA-Z0-9-_./]+)')
+@command_handler('cd', '(?P<database_name>[a-zA-Z0-9-_./]+)', help=('cd <dbname>\n\n',
+                                                                    'Change the current database'))
 def cd(environment, couch_server, variables):
     database_name = variables.get('database_name')
     try:
