@@ -215,8 +215,7 @@ def test_man_unrecognized_command(environment, couch_server):
 
 def test_man_command_has_no_help(environment, couch_server):
     @command_handler('xyz')
-    def xyz(*args, **kwargs):
-        pass
+    def xyz(*args, **kwargs): pass  # pragma: nocover
 
     eval_(environment, couch_server, 'man xyz')
     output = _get_output(environment)
@@ -224,9 +223,9 @@ def test_man_command_has_no_help(environment, couch_server):
 
 
 def test_man_command_has_help(environment, couch_server):
-    @command_handler('xyz', '', help='Blah blah')
+    @command_handler('xyz')
     def xyz(*args, **kwargs):
-        pass
+        """Blah blah"""
 
     eval_(environment, couch_server, 'man xyz')
     output = _get_output(environment)

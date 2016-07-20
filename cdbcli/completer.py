@@ -24,11 +24,19 @@ def _fetch_view_ids(environment, couch_server):
     if environment.current_db is None:
         return []
 
+    return filter(is_view, list(environment.current_db))
+
+
+def _fetch_view_paths(environment, couch_server):
+    view_ids = _fetch_view_ids(environment, couch_server)
+    if not view_ids:
+        return []
+
     paths = []
-    for view_id in filter(is_view, list(environment.current_db)):
+    for view_id in view_ids:
         view_doc = environment.current_db[view_id]
         paths.extend([
-            '{}/_view/{}'.format(view_id, view_name)
+            '{}:{}'.format(view_id, view_name)
             for view_name in dict(view_doc.items())['views'].keys()
         ])
 
@@ -42,4 +50,5 @@ def get_completer(environment, couch_server):
         'database_name': WordCompleter(functools.partial(_fetch_db_names, environment, couch_server)),
         'doc_id': WordCompleter(functools.partial(_fetch_doc_ids, environment, couch_server)),
         'view_doc_id': WordCompleter(functools.partial(_fetch_view_ids, environment, couch_server)),
+        'view_path': WordCompleter(functools.partial(_fetch_view_paths, environment, couch_server)),
     })

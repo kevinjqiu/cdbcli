@@ -43,7 +43,7 @@ def eval_(environment, couch_server, command_text):
     handler(environment=environment, couch_server=couch_server, variables=m.variables())
 
 
-class Repl(object):
+class Repl():
     def __init__(self, couch_server, config):
         self._couch_server = couch_server
         self._config = config
