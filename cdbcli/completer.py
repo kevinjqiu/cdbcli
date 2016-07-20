@@ -41,5 +41,5 @@ def get_completer(environment, couch_server):
         'target': WordCompleter(COMMANDS.keys()),
         'database_name': WordCompleter(functools.partial(_fetch_db_names, environment, couch_server)),
         'doc_id': WordCompleter(functools.partial(_fetch_doc_ids, environment, couch_server)),
-        'view_id': WordCompleter(functools.partial(_fetch_view_ids, environment, couch_server)),
+        'view_doc_id': WordCompleter(functools.partial(_fetch_view_ids, environment, couch_server)),
     })
