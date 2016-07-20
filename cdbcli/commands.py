@@ -118,7 +118,10 @@ def cat(environment, couch_server, variables):
                                                         'Execute the view given the full view path\n'))
 @require_current_db
 def exec_(environment, couch_server, variables):
-    view_id, view_name = variables.get('view_path').split(':')
+    view_path = variables.get('view_path')
+    if ':' not in view_path:
+        raise RuntimeError('Invalid view_path. Must be of the form: view_doc_id:view_name')
+    view_id, view_name = view_path.split(':', 1)
     if not view_id:
         raise RuntimeError('View not found')
 
@@ -159,7 +162,8 @@ def lv(environment, couch_server, variables):
     highlighter = {
         'python': highlight_python,
         'javascript': highlight_javascript,
-    }.get(language, lambda x: x)
+        None: lambda x: x
+    }.get(language)
 
     views = view_doc.get('views')
     for view_name, view_funcs in views.items():

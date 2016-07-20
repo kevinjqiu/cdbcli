@@ -180,7 +180,7 @@ def test_exec_view(environment, couch_server, mocker):
     db.save(get_user_design_doc())
     environment.current_db = db
     mock_highlight = _get_mock_highlight_json(mocker)
-    eval_(environment, couch_server, 'exec _design/users/_view/by_lastname')
+    eval_(environment, couch_server, 'exec _design/users:by_lastname')
     highlighted = _get_highlighted(mock_highlight)
     expected = set(['washington', 'jefferson', 'adams'])
     actual = set([x['key'] for x in highlighted])
