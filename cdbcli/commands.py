@@ -14,12 +14,12 @@ COMMANDS = {}
 Command = namedtuple('Command', ['handler', 'pattern', 'help'])
 
 
-def command_handler(command, pattern=None, help=None):
+def command_handler(command, pattern=None):
     def decorator(fn):
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
             return fn(*args, **kwargs)
-        COMMANDS[command] = Command(wrapper, pattern, help)
+        COMMANDS[command] = Command(wrapper, pattern, fn.__doc__)
         return wrapper
     return decorator
 
@@ -62,8 +62,12 @@ def is_view(doc):
     return doc.startswith('_design/')
 
 
-@command_handler('ls', help='ls\n\nShow the documents in the current database')
+@command_handler('ls')
 def ls(environment, couch_server, variables):
+    """ls
+
+    Show the documents in the current database.
+    """
     if environment.current_db is None:
         all_dbs = get_all_dbs(environment, couch_server)
 
@@ -77,9 +81,12 @@ def ls(environment, couch_server, variables):
             environment.output('{} {}'.format(type_, doc))
 
 
-@command_handler('cd', '(?P<database_name>[a-zA-Z0-9-_./]+)', help=('cd <dbname>\n\n',
-                                                                    'Change the current database'))
+@command_handler('cd', '(?P<database_name>[a-zA-Z0-9-_./]+)')
 def cd(environment, couch_server, variables):
+    """cd <database_name>
+
+    Change the current database
+    """
     database_name = variables.get('database_name')
     try:
         if not database_name or database_name == '/' or database_name == '..':
@@ -92,17 +99,24 @@ def cd(environment, couch_server, variables):
         raise RuntimeError("Database '{}' does not exist".format(database_name))
 
 
-@command_handler('info', help='info\n\nShow the information of the current database')
+@command_handler('info')
 @require_current_db
 def info(environment, couch_server, variables):
+    """info
+
+    Show the information of the current database.
+    """
     info = environment.current_db.info()
     environment.output(highlight_json(info))
 
 
-@command_handler('cat', '(?P<doc_id>[^\s]+)', help=('cat <doc_id>\n\n'
-                                                    'Show the content of a document by its id'))
+@command_handler('cat', '(?P<doc_id>[^\s]+)')
 @require_current_db
 def cat(environment, couch_server, variables):
+    """cat <doc_id>
+
+    Show the content of a document by its id.
+    """
     doc_id = variables.get('doc_id')
     if not doc_id:
         raise RuntimeError('Document not found')
@@ -114,10 +128,13 @@ def cat(environment, couch_server, variables):
     environment.output(highlight_json(doc))
 
 
-@command_handler('exec', '(?P<view_path>[^\s]+)', help=('exec <view_path>\n\n'
-                                                        'Execute the view given the full view path\n'))
+@command_handler('exec', '(?P<view_path>[^\s]+)')
 @require_current_db
 def exec_(environment, couch_server, variables):
+    """exec <view_path>
+
+    Execute the view given the full view path.
+    """
     view_path = variables.get('view_path')
     if ':' not in view_path:
         raise RuntimeError('Invalid view_path. Must be of the form: view_doc_id:view_name')
@@ -133,9 +150,12 @@ def exec_(environment, couch_server, variables):
         raise RuntimeError('Unable to exec view: {}'.format(view_id))
 
 
-@command_handler('mkdir', '(?P<database_name>[a-zA-Z0-9-_]+)', help=('mkdir <dbname>\n\n'
-                                                                     'Create a database'))
+@command_handler('mkdir', '(?P<database_name>[a-zA-Z0-9-_]+)')
 def mkdir(environment, couch_server, variables):
+    """mkdir <database_name>
+
+    Create a database
+    """
     if environment.current_db is not None:
         raise RuntimeError('You can only create databases from /')
 
@@ -148,10 +168,13 @@ def mkdir(environment, couch_server, variables):
     environment.output('Created {}'.format(database_name))
 
 
-@command_handler('lv', '(?P<view_doc_id>[a-zA-Z0-9-_/]+)', help=('lv <view_doc_id>\n\n'
-                                                                 'Show the views inside the view document'))
+@command_handler('lv', '(?P<view_doc_id>[a-zA-Z0-9-_/]+)')
 @require_current_db
 def lv(environment, couch_server, variables):
+    """lv <view_doc_id>
+
+    Show the views inside the view document.
+    """
     view_doc_id = variables['view_doc_id']
     if view_doc_id not in environment.current_db:
         raise RuntimeError('{} not found'.format(view_doc_id))
@@ -174,8 +197,12 @@ def lv(environment, couch_server, variables):
         environment.output(highlighter(reduce_func))
 
 
-@command_handler('man', pattern='(?P<target>[a-zA-Z0-9-_]+)', help='Show help for command')
+@command_handler('man', pattern='(?P<target>[a-zA-Z0-9-_]+)')
 def man(environment, couch_server, variables):
+    """man <command>
+
+    Show help for the command.
+    """
     command = variables.get('target')
     command_handler = COMMANDS.get(command)
     if not command_handler:
@@ -192,4 +219,8 @@ def man(environment, couch_server, variables):
 
 @command_handler('exit')
 def exit(environment, couch_server, variables):
+    """exit
+
+    Quit cdbcli.
+    """
     raise EOFError()
