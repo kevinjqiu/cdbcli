@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="cdbcli",
-    version="0.1.0",
+    version="0.1.1",
     url="https://github.com/kevinjqiu/cdbcli",
 
     author="Kevin J. Qiu",
