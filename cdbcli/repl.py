@@ -76,6 +76,7 @@ class Repl():
                 args = {
                     'history': history.InMemoryHistory(),
                     'enable_history_search': True,
+                    'enable_open_in_editor': True,
                     'lexer': lexer,
                     'completer': get_completer(self._environment, self._couch_server),
                     'style': style,
