@@ -189,6 +189,10 @@ def lv(environment, couch_server, variables):
     }.get(language)
 
     views = view_doc.get('views')
+
+    if not views:
+        raise RuntimeError("The design doc {} doesn't have any views".format(view_doc_id))
+
     for view_name, view_funcs in views.items():
         environment.output('{}:{}'.format(view_doc_id, view_name))
         map_func = view_funcs.get('map', '')

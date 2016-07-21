@@ -49,3 +49,10 @@ def get_user_design_doc():
             }
         }
     }
+
+
+def get_empty_design_doc():
+    return {
+        '_id': '_design/empty',
+        'language': 'python',
+    }

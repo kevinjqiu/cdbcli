@@ -205,7 +205,15 @@ def test_lv_lists_views_inside_view_doc(environment, couch_server):
     db.save(get_user_design_doc())
     environment.current_db = db
     eval_(environment, couch_server, 'lv _design/users')
-    # assert map function is displayed
+    # TODO: assert map function is displayed
+
+
+def test_lv_no_view(environment, couch_server):
+    db = couch_server.create('test')
+    db.save(get_empty_design_doc())
+    environment.current_db = db
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'lv _design/empty')
 
 
 def test_man_unrecognized_command(environment, couch_server):
