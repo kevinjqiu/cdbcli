@@ -1,7 +1,7 @@
 import pytest
 
 from cdbcli.repl import eval_
-from cdbcli.commands import command_handler
+from cdbcli.commands import command_handler, COMMANDS
 from tests.integration.fixtures import *  # noqa
 
 
@@ -22,6 +22,19 @@ def _get_highlighted(mock_highlight):
         for c in mock_highlight.call_args_list
     ]
     return args
+
+
+def test_command_alias(environment, couch_server):
+    @command_handler('abc', aliases=['duh', 'huh'])
+    def abc(environment, couch_server):
+        """Blah blah"""
+        environment.output('Done.')
+
+    assert 'abc' in COMMANDS
+    handler = COMMANDS['abc']
+    assert 'duh' in COMMANDS
+    assert 'huh' in COMMANDS
+    assert handler is COMMANDS['duh'] is COMMANDS['huh']
 
 
 def test_info_command_raises_error_when_no_current_db(environment, couch_server):

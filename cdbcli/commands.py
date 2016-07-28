@@ -14,12 +14,15 @@ COMMANDS = {}
 Command = namedtuple('Command', ['handler', 'pattern', 'help'])
 
 
-def command_handler(command, pattern=None):
+def command_handler(command, pattern=None, aliases=None):
     def decorator(fn):
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
             return fn(*args, **kwargs)
+
         COMMANDS[command] = Command(wrapper, pattern, fn.__doc__)
+        for alias in (aliases or []):
+            COMMANDS[alias] = COMMANDS[command]
         return wrapper
     return decorator
 
@@ -228,3 +231,8 @@ def exit(environment, couch_server, variables):
     Quit cdbcli.
     """
     raise EOFError()
+
+
+@command_handler('vim')
+def edit(environment, couch_server, variables):
+    pass
