@@ -236,6 +236,16 @@ def exit(environment, couch_server, variables):
     raise EOFError()
 
 
+def _save_doc_to_file(file_path, doc):
+    with io.open(file_path, 'w', encoding='utf8') as fh:
+        json.dump(doc, fh, sort_keys=True, indent=4)
+
+
+def _load_doc_from_file(file_path):
+    with io.open(file_path, 'r', encoding='utf8') as fh:
+        return json.load(fh)
+
+
 @command_handler('vim', pattern='(?P<doc_id>[^\s]+)', aliases=['vi', 'emacs', 'ed'])
 @require_current_db
 def edit(environment, couch_server, variables):
@@ -254,20 +264,22 @@ def edit(environment, couch_server, variables):
     _, file_path = tempfile.mkstemp('.json')
     if mode == 'edit':
         doc = environment.current_db[doc_id]
-        with io.open(file_path, 'w', encoding='utf8') as fh:
-            json.dump(doc, fh, sort_keys=True, indent=4)
+        _save_doc_to_file(file_path, doc)
 
     success = environment.run_in_terminal(lambda: utils.open_file_in_editor(file_path))
     if not success:
         return  # abort
 
     try:
-        with io.open(file_path, 'r', encoding='utf8') as fh:
-            json_doc = json.load(fh)
+        updated_doc = _load_doc_from_file(file_path)
 
         if mode == 'edit':
-            del json_doc['_rev']
-
-        environment.current_db.save(json_doc)
+            updated_doc.pop('_rev', None)
+            updated_doc.pop('_id', None)
+            for key, value in updated_doc.items():
+                doc[key] = value
+            environment.current_db.save(doc)
+        else:
+            environment.current_db[doc_id] = updated_doc
     except Exception as e:
         raise RuntimeError(str(e))
