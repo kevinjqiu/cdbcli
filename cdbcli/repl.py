@@ -4,7 +4,7 @@ import couchdb
 
 import prompt_toolkit as pt
 from prompt_toolkit import history, shortcuts
-from .lexer import lexer
+from .lexer import lexer, split_cli_command_and_shell_commands
 from .completer import get_completer
 from .style import style
 from .grammar import grammar
@@ -30,14 +30,16 @@ def eval_(environment, couch_server, command_text):
     if not command_text:
         return
 
-    m = grammar.match_prefix(command_text)
+    cli_command, shell_commands = split_cli_command_and_shell_commands(command_text)
+
+    m = grammar.match_prefix(cli_command)
     if not m:
         raise RuntimeError('Invalid input')
 
     command = m.variables().get('command')
 
     if command not in COMMANDS:
-        raise RuntimeError('{}: command not found'.format(command_text))
+        raise RuntimeError('{}: command not found'.format(cli_command))
 
     handler, _, _ = COMMANDS[command]
     handler(environment=environment, couch_server=couch_server, variables=m.variables())

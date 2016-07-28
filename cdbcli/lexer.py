@@ -1,3 +1,4 @@
+import re
 import shlex
 
 from prompt_toolkit.contrib.regular_languages.lexer import GrammarLexer
@@ -29,8 +30,9 @@ def split_cli_command_and_shell_commands(command_text):
     parts = []
     stack = []
     for token in tokens:
+        # TODO: this is probably not the best way to parse shell commands
         if token != '|':
-            if token == ' ':
+            if re.search(r'\s+', token):
                 # since we split by ' '
                 # any token left in the queue
                 # that's a ' ' should be quoted
