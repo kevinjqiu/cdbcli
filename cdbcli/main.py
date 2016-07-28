@@ -1,9 +1,9 @@
-import getpass
-
 import couchdb
 import click
 
 from cdbcli import repl
+
+from prompt_toolkit import prompt
 
 
 class Config(object):
@@ -56,7 +56,7 @@ class Config(object):
 @click.argument('database', default='', required=False)
 def main(host, port, username, password, askpass, tls, database):
     if askpass:
-        password = getpass.getpass('Enter password: ')
+        password = prompt('Enter password: ', is_password=True)
 
     config = Config(host, port, username, password, tls, database)
     couch_server = couchdb.Server(config.url)
