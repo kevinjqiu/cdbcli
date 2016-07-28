@@ -264,9 +264,13 @@ def edit(environment, couch_server, variables):
     _, file_path = tempfile.mkstemp('.json')
     if mode == 'edit':
         doc = environment.current_db[doc_id]
-        _save_doc_to_file(file_path, doc)
+        safe_doc = dict(doc)
+        safe_doc.pop('_rev', None)
+        safe_doc.pop('_id', None)
+        _save_doc_to_file(file_path, safe_doc)
 
     success = environment.run_in_terminal(lambda: utils.open_file_in_editor(file_path))
+
     if not success:
         return  # abort
 
