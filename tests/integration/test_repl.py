@@ -87,6 +87,29 @@ def test_cd_slash_does_not_change_db_if_already_root(environment, couch_server):
     assert environment.current_db is None
 
 
+def test_cd_dash_switches_root_and_database(environment, couch_server):
+    environment.current_db = couch_server.create('test')
+    eval_(environment, couch_server, 'cd -')
+    assert environment.current_db is None
+    assert environment.oldpwd.name == 'test'
+    eval_(environment, couch_server, 'cd -')
+    assert environment.current_db.name == 'test'
+    assert environment.oldpwd is None
+
+
+def test_cd_dash_switches_databases(environment, couch_server):
+    environment.current_db = couch_server.create('test1')
+    environment.current_db = couch_server.create('test2')
+    eval_(environment, couch_server, 'cd test1')
+    assert environment.current_db.name == 'test1'
+    eval_(environment, couch_server, 'cd test2')
+    assert environment.current_db.name == 'test2'
+    eval_(environment, couch_server, 'cd -')
+    assert environment.current_db.name == 'test1'
+    eval_(environment, couch_server, 'cd -')
+    assert environment.current_db.name == 'test2'
+
+
 def test_ls_shows_all_dbs_if_no_current_db(environment, couch_server):
     eval_(environment, couch_server, 'ls')
     assert environment.current_db is None
