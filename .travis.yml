@@ -4,11 +4,16 @@ services:
 language: python
 env:
     - TOXENV=py35
-install: pip install tox
+install:
+    - pip install tox
+    - pip install -r requirements-docs.txt
 before_script:
     make start_couchdb 
-script: tox
+script:
+    - tox
+    - make docs
 after_script:
-    make stop_couchdb
+    - make stop_couchdb
+    - make clean_docs
 after_success:
     coveralls
