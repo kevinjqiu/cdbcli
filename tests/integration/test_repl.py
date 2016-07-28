@@ -1,4 +1,3 @@
-import os
 import pytest
 
 from cdbcli.repl import eval_
