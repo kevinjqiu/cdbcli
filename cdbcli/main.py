@@ -32,11 +32,8 @@ class Config(object):
 
     @property
     def _cred_string(self):
-        if not self.__username and not self.__password:
+        if not self.__username or not self.__password:
             return ''
-
-        if self.__username and not self.__password:
-            return '{}@'.format(self.__username)
 
         return '{}:{}@'.format(self.__username, self.__password)
 
