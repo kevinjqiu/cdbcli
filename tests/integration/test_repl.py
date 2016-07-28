@@ -91,10 +91,10 @@ def test_cd_dash_switches_root_and_database(environment, couch_server):
     environment.current_db = couch_server.create('test')
     eval_(environment, couch_server, 'cd -')
     assert environment.current_db is None
-    assert environment.oldpwd.name == 'test'
+    assert environment.previous_db.name == 'test'
     eval_(environment, couch_server, 'cd -')
     assert environment.current_db.name == 'test'
-    assert environment.oldpwd is None
+    assert environment.previous_db is None
 
 
 def test_cd_dash_switches_databases(environment, couch_server):
@@ -106,8 +106,10 @@ def test_cd_dash_switches_databases(environment, couch_server):
     assert environment.current_db.name == 'test2'
     eval_(environment, couch_server, 'cd -')
     assert environment.current_db.name == 'test1'
+    assert environment.previous_db.name == 'test2'
     eval_(environment, couch_server, 'cd -')
     assert environment.current_db.name == 'test2'
+    assert environment.previous_db.name == 'test1'
 
 
 def test_ls_shows_all_dbs_if_no_current_db(environment, couch_server):
