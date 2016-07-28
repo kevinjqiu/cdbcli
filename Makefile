@@ -1,4 +1,4 @@
-.PHONY: tests
+.PHONY: tests docs
 
 start_couchdb:
 	.travis/start-couchdb.sh
@@ -11,3 +11,7 @@ flake8:
 
 test: flake8
 	py.test --cov=cdbcli --cov=tests --cov-report term-missing tests
+
+docs:
+	rm docs/build -rvf
+	sphinx-build -b html docs docs/build
