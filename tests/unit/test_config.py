@@ -8,7 +8,7 @@ def test_no_cred_str_if_neither_username_password_given():
 
 def test_cred_str_when_only_username_is_given():
     cfg = Config('localhost', 5984, 'user', None, False, '')
-    assert cfg.url == 'http://user@localhost:5984'
+    assert cfg.url == 'http://localhost:5984'
 
 
 def test_cred_str_when_username_and_password_given():
