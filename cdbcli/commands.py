@@ -257,7 +257,7 @@ def edit(environment, couch_server, variables):
         with io.open(file_path, 'w', encoding='utf8') as fh:
             json.dump(doc, fh, sort_keys=True, indent=4)
 
-    success = environment.cli.run_in_terminal(lambda: utils.open_file_in_editor(file_path))
+    success = environment.run_in_terminal(lambda: utils.open_file_in_editor(file_path))
     if not success:
         return  # abort
 

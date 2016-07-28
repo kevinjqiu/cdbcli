@@ -1,3 +1,4 @@
+import tempfile
 import pytest
 
 from cdbcli.repl import eval_
@@ -252,3 +253,30 @@ def test_man_command_has_help(environment, couch_server):
     eval_(environment, couch_server, 'man xyz')
     output = _get_output(environment)
     assert 'Blah blah' == output.strip()
+
+
+def test_edit_requires_current_db(environment, couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'vim blah')
+
+
+def test_edit_creates_document_if_doc_id_not_exists(environment, couch_server, mocker):
+    db = couch_server.create('test')
+    db.save(get_empty_design_doc())
+    environment.current_db = db
+    tmp = mocker.patch('cdbcli.commands.tempfile.mkstemp')
+    tmp.mkstemp.return_value = tempfile.mkstemp
+    environment.cli = mocker.mock()
+    eval_(environment, couch_server, 'vim blah')
+
+
+def test_edit_updates_document_if_doc_id_exists(environment, couch_server):
+    pass
+
+
+def test_edit_fails_if_doc_is_not_json(environment, couch_server):
+    pass
+
+
+def test_edit_fails_if_couchdb_save_fails(environment, couch_server):
+    pass
