@@ -3,7 +3,7 @@ from __future__ import print_function
 import couchdb
 
 import prompt_toolkit as pt
-from prompt_toolkit import history, shortcuts
+from prompt_toolkit import history
 from .lexer import lexer
 from .completer import get_completer
 from .style import style

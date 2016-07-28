@@ -7,7 +7,7 @@ stop_couchdb:
 	.travis/stop-couchdb.sh
 
 flake8:
-	flake8 --max-line-length=120 cdbcli tests
+	flake8 --max-line-length=120 --ignore=F405 cdbcli tests
 
-test:
+test: flake8
 	py.test --cov=cdbcli --cov=tests --cov-report term-missing tests
