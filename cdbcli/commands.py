@@ -1,11 +1,14 @@
 import functools
+import io
 import json
 import traceback
+import tempfile
 
 import couchdb
 import pygments
 from pygments import lexers, formatters
 from collections import namedtuple
+from cdbcli import utils
 
 
 COMMANDS = {}
@@ -14,12 +17,15 @@ COMMANDS = {}
 Command = namedtuple('Command', ['handler', 'pattern', 'help'])
 
 
-def command_handler(command, pattern=None):
+def command_handler(command, pattern=None, aliases=None):
     def decorator(fn):
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
             return fn(*args, **kwargs)
+
         COMMANDS[command] = Command(wrapper, pattern, fn.__doc__)
+        for alias in (aliases or []):
+            COMMANDS[alias] = COMMANDS[command]
         return wrapper
     return decorator
 
@@ -228,3 +234,56 @@ def exit(environment, couch_server, variables):
     Quit cdbcli.
     """
     raise EOFError()
+
+
+def _save_doc_to_file(file_path, doc):
+    with io.open(file_path, 'w', encoding='utf8') as fh:
+        json.dump(doc, fh, sort_keys=True, indent=4)
+
+
+def _load_doc_from_file(file_path):
+    with io.open(file_path, 'r', encoding='utf8') as fh:
+        return json.load(fh)
+
+
+@command_handler('vim', pattern='(?P<doc_id>[^\s]+)', aliases=['vi', 'emacs', 'ed'])
+@require_current_db
+def edit(environment, couch_server, variables):
+    """vim|vi|emacs|ed <doc_id>
+
+    Open an external $EDITOR to edit or create a new document
+
+    When <doc_id> exists, the text editor is open with the existing doc for editing.
+    When <doc_id> doesn't exist, the text editor is open with a blank document for creation.
+
+    Note: it doesn't matter which command you use, vi, emacs or ed, it will only use your $EDITOR
+    """
+    doc_id = variables.get('doc_id')
+    mode = 'create' if doc_id not in environment.current_db else 'edit'
+
+    _, file_path = tempfile.mkstemp('.json')
+    if mode == 'edit':
+        doc = environment.current_db[doc_id]
+        safe_doc = dict(doc)
+        safe_doc.pop('_rev', None)
+        safe_doc.pop('_id', None)
+        _save_doc_to_file(file_path, safe_doc)
+
+    success = environment.run_in_terminal(lambda: utils.open_file_in_editor(file_path))
+
+    if not success:
+        return  # abort
+
+    try:
+        updated_doc = _load_doc_from_file(file_path)
+
+        if mode == 'edit':
+            updated_doc.pop('_rev', None)
+            updated_doc.pop('_id', None)
+            for key, value in updated_doc.items():
+                doc[key] = value
+            environment.current_db.save(doc)
+        else:
+            environment.current_db[doc_id] = updated_doc
+    except Exception as e:
+        raise RuntimeError(str(e))

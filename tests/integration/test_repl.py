@@ -1,7 +1,12 @@
+import io
+import json
+import tempfile
 import pytest
 
+from unittest.mock import Mock
+
 from cdbcli.repl import eval_
-from cdbcli.commands import command_handler
+from cdbcli.commands import command_handler, COMMANDS
 from tests.integration.fixtures import *  # noqa
 
 
@@ -22,6 +27,19 @@ def _get_highlighted(mock_highlight):
         for c in mock_highlight.call_args_list
     ]
     return args
+
+
+def test_command_alias(environment, couch_server):
+    @command_handler('abc', aliases=['duh', 'huh'])
+    def abc(environment, couch_server):
+        """Blah blah"""
+        environment.output('Done.')
+
+    assert 'abc' in COMMANDS
+    handler = COMMANDS['abc']
+    assert 'duh' in COMMANDS
+    assert 'huh' in COMMANDS
+    assert handler is COMMANDS['duh'] is COMMANDS['huh']
 
 
 def test_info_command_raises_error_when_no_current_db(environment, couch_server):
@@ -239,3 +257,47 @@ def test_man_command_has_help(environment, couch_server):
     eval_(environment, couch_server, 'man xyz')
     output = _get_output(environment)
     assert 'Blah blah' == output.strip()
+
+
+def test_edit_requires_current_db(environment, couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'vim blah')
+
+
+def _setup_edit_environment(environment, couch_server, mocker, file_content):
+    mkstemp_return = tempfile.mkstemp()
+    db = couch_server.create('test')
+    environment.current_db = db
+    tmp = mocker.patch('cdbcli.commands.tempfile.mkstemp')
+    tmp.return_value = mkstemp_return
+    environment.cli = Mock()
+    with io.open(tmp.return_value[1], 'w') as f:
+        f.write(file_content)
+
+
+def test_edit_creates_document_if_doc_id_not_exists(environment, couch_server, mocker):
+    doc = {"firstName": "willy", "lastName": "wonka"}
+    _setup_edit_environment(environment, couch_server, mocker, json.dumps(doc))
+    eval_(environment, couch_server, 'vim ww')
+
+    assert environment.current_db['ww'] is not None
+    assert environment.current_db['ww'].get('firstName') == doc['firstName']
+    assert environment.current_db['ww'].get('lastName') == doc['lastName']
+
+
+def test_edit_updates_document_if_doc_id_exists(environment, couch_server, mocker):
+    doc = {"firstName": "willy", "lastName": "wonka"}
+    _setup_edit_environment(environment, couch_server, mocker, json.dumps(doc))
+    mocker.patch('cdbcli.commands._save_doc_to_file')
+    environment.current_db.save({'_id': 'ww', 'firstName': 'Walt', 'lastName': 'White'})
+    eval_(environment, couch_server, 'vim ww')
+
+    assert environment.current_db['ww'] is not None
+    assert environment.current_db['ww'].get('firstName') == doc['firstName']
+    assert environment.current_db['ww'].get('lastName') == doc['lastName']
+
+
+def test_edit_fails_if_doc_is_not_json(environment, couch_server, mocker):
+    _setup_edit_environment(environment, couch_server, mocker, 'this is not json')
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'vim ww')
