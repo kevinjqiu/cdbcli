@@ -6,6 +6,7 @@ class Environment(object):
         self.current_db = current_db
         self.output_stream = output_stream
         self.cli = None
+        self.previous_db = None
 
     def output(self, text):
         self.output_stream.write(text)

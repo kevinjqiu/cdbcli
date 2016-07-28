@@ -96,11 +96,11 @@ def cd(environment, couch_server, variables):
     database_name = variables.get('database_name')
     try:
         if not database_name or database_name == '/' or database_name == '..':
-            environment.current_db = None
+            environment.current_db, environment.previous_db = None, environment.current_db
         elif database_name == '-':
-            pass  # TODO: implement 'previous' database
+            environment.current_db, environment.previous_db = environment.previous_db, environment.current_db
         else:
-            environment.current_db = couch_server[database_name]
+            environment.current_db, environment.previous_db = couch_server[database_name], environment.current_db
     except (couchdb.ResourceNotFound, couchdb.ServerError):
         raise RuntimeError("Database '{}' does not exist".format(database_name))
 
