@@ -3,7 +3,7 @@ from __future__ import print_function
 import couchdb
 
 import prompt_toolkit as pt
-from prompt_toolkit import history
+from prompt_toolkit import history, shortcuts
 from .lexer import lexer
 from .completer import get_completer
 from .style import style
@@ -71,18 +71,17 @@ class Repl():
         self._environment.output(message)
 
     def _run(self):
+        args = {
+            'history': history.InMemoryHistory(),
+            'enable_history_search': True,
+            'enable_open_in_editor': True,
+            'lexer': lexer,
+            'completer': get_completer(self._environment, self._couch_server),
+            'style': style,
+        }
         while True:
             try:
-                args = {
-                    'history': history.InMemoryHistory(),
-                    'enable_history_search': True,
-                    'enable_open_in_editor': True,
-                    'lexer': lexer,
-                    'completer': get_completer(self._environment, self._couch_server),
-                    'style': style,
-                }
                 cmd_text = pt.prompt(self.prompt, **args).rstrip()
-
                 eval_(self._environment, self._couch_server, cmd_text)
             except RuntimeError as e:
                 self._environment.output(str(e))
