@@ -3,7 +3,7 @@ from __future__ import print_function
 import couchdb
 
 import prompt_toolkit as pt
-from prompt_toolkit import history
+from prompt_toolkit import history, shortcuts
 from .lexer import lexer
 from .completer import get_completer
 from .style import style
@@ -81,8 +81,12 @@ class Repl():
         }
         while True:
             try:
-                cmd_text = pt.prompt(self.prompt, **args).rstrip()
+                cli = pt.CommandLineInterface(application=shortcuts.create_prompt_application(self.prompt, **args),
+                                              eventloop=shortcuts.create_eventloop())
+                self._environment.cli = cli
+                cmd_text = cli.run().text.rstrip()
                 eval_(self._environment, self._couch_server, cmd_text)
+                cli.reset()
             except RuntimeError as e:
                 self._environment.output(str(e))
             except (EOFError, KeyboardInterrupt):

@@ -1,11 +1,16 @@
+import contextlib
 import functools
+import io
 import json
+import os
 import traceback
+import tempfile
 
 import couchdb
 import pygments
 from pygments import lexers, formatters
 from collections import namedtuple
+from cdbcli import utils
 
 
 COMMANDS = {}
@@ -233,6 +238,38 @@ def exit(environment, couch_server, variables):
     raise EOFError()
 
 
-@command_handler('vim')
+@command_handler('vim', pattern='(?P<doc_id>[^\s]+)', aliases=['vi', 'emacs', 'ed'])
+@require_current_db
 def edit(environment, couch_server, variables):
-    pass
+    """vim|vi|emacs|ed <doc_id>
+
+    Open an external $EDITOR to edit or create a new document
+
+    When <doc_id> exists, the text editor is open with the existing doc for editing.
+    When <doc_id> doesn't exist, the text editor is open with a blank document for creation.
+
+    Note: it doesn't matter which command you use, vi, emacs or ed, it will only use your $EDITOR
+    """
+    doc_id = variables.get('doc_id')
+    mode = 'create' if doc_id not in environment.current_db else 'edit'
+
+    _, file_path = tempfile.mkstemp('.json')
+    if mode == 'edit':
+        doc = environment.current_db[doc_id]
+        with io.open(file_path, 'w', encoding='utf8') as fh:
+            json.dump(doc, fh, sort_keys=True, indent=4)
+
+    success = environment.cli.run_in_terminal(lambda: utils.open_file_in_editor(file_path))
+    if not success:
+        return  # abort
+
+    try:
+        with io.open(file_path, 'r', encoding='utf8') as fh:
+            json_doc = json.load(fh)
+
+        if mode == 'edit':
+            del json_doc['_rev']
+
+        environment.current_db.save(json_doc)
+    except Exception as e:
+        raise RuntimeError(str(e))
