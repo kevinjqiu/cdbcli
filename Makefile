@@ -12,6 +12,9 @@ flake8:
 test: flake8
 	py.test --cov=cdbcli --cov=tests --cov-report term-missing tests
 
-docs:
-	rm docs/build -rvf
+docs: clean_docs
 	sphinx-build -b html docs docs/build
+
+clean_docs:
+	rm docs/build -rvf
+
