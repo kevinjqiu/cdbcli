@@ -2,6 +2,7 @@ import couchdb
 import click
 
 from cdbcli import repl
+from cdbcli import __version__ as cdbcli_version
 
 from prompt_toolkit import prompt
 
@@ -50,8 +51,12 @@ class Config():
 @click.option('-p', '--password', default=None, help='The password')
 @click.option('-P', '--askpass/--no-askpass', default=False, help='Ask for password?')
 @click.option('--tls/--no-tls', default=False, help='Use TLS to connect to the couchdb instance?')
+@click.option('-ver', '--version', is_flag=True)
 @click.argument('database', default='', required=False)
-def main(host, port, username, password, askpass, tls, database):
+def main(host, port, username, password, askpass, tls, version, database):
+    if version:
+        print_version()
+
     if askpass:
         password = prompt('Enter password: ', is_password=True)
 
@@ -59,3 +64,10 @@ def main(host, port, username, password, askpass, tls, database):
     couch_server = couchdb.Server(config.url)
     r = repl.Repl(couch_server, config)
     r.run()
+
+
+def print_version():
+    import sys
+    import os
+    print('{} version {}'.format(os.path.basename(sys.argv[0]), cdbcli_version))
+    exit()
