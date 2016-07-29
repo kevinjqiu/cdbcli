@@ -39,7 +39,7 @@ class Environment():
             else:
                 stdin = subprocs[i - 1].stdout
 
-            process = subprocess.Popen(shell_command, stdin=stdin, stdout=stdout)
+            process = subprocess.Popen(shell_command, stdin=stdin, stdout=stdout, stderr=sys.stderr)
             subprocs.append(process)
 
         if subprocs:

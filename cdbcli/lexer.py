@@ -33,13 +33,7 @@ def split_cli_command_and_shell_commands(command_text):
     for token in tokens:
         # TODO: this is probably not the best way to parse shell commands
         if token != '|':
-            if re.search(r'\s+', token):
-                # since we split by ' '
-                # any token left in the queue
-                # that's a ' ' should be quoted
-                stack.append(shlex.quote(token))
-            else:
-                stack.append(token)
+            stack.append(token)
         else:
             parts.append(list(stack))
             stack.clear()

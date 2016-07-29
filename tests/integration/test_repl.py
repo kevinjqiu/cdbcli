@@ -328,7 +328,7 @@ def test_edit_fails_if_doc_is_not_json(environment, couch_server, mocker):
         eval_(environment, couch_server, 'vim ww')
 
 
-def test_rm_removes_the_document(environment, couch_server, mocker):
+def test_rm_removes_the_document(environment, couch_server):
     db = couch_server.create('test')
     [db.save(get_user_doc(first_name, last_name))
      for first_name, last_name in [('george', 'washington'),
@@ -342,7 +342,7 @@ def test_rm_removes_the_document(environment, couch_server, mocker):
     assert 'Deleted document george.washington' == output.strip()
 
 
-def test_rm_raises_exception_if_doc_not_found(environment, couch_server, mocker):
+def test_rm_raises_exception_if_doc_not_found(environment, couch_server):
     db = couch_server.create('test')
     [db.save(get_user_doc(first_name, last_name))
      for first_name, last_name in [('george', 'washington'),
@@ -354,8 +354,46 @@ def test_rm_raises_exception_if_doc_not_found(environment, couch_server, mocker)
         eval_(environment, couch_server, 'rm john.smith')
 
 
-def test_rm_raises_exception_if_no_doc_provided(environment, couch_server, mocker):
+def test_rm_raises_exception_if_no_doc_provided(environment, couch_server):
     db = couch_server.create('test')
     environment.current_db = db
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'rm')
+
+
+def test_pipe_commands_one_pipe(environment, couch_server):
+    db = couch_server.create('test')
+    [db.save(get_user_doc(first_name, last_name))
+     for first_name, last_name in [('william', 'shakespear'),
+                                   ('william', 'shatner'),
+                                   ('bill', 'gates')]
+     ]
+    environment.current_db = db
+    _, file_path = tempfile.mkstemp()
+    with io.open(file_path, 'w') as f:
+        environment.output_stream = f
+        eval_(environment, couch_server, 'ls | grep william')
+
+    with io.open(file_path, 'r') as f:
+        output = f.readlines()
+    assert 'william.shakespear' in output[0]
+    assert 'william.shatner' in output[1]
+
+
+def test_pip_commands_multiple_pipes(environment, couch_server):
+    db = couch_server.create('test')
+    [db.save(get_user_doc(first_name, last_name))
+     for first_name, last_name in [('william', 'shakespear'),
+                                   ('william', 'shatner'),
+                                   ('bill', 'gates')]
+     ]
+    environment.current_db = db
+    _, file_path = tempfile.mkstemp()
+    with io.open(file_path, 'w') as f:
+        environment.output_stream = f
+        eval_(environment, couch_server, 'ls | cut -d " " -f 2 | cut -d "." -f 1 | sort | uniq')
+
+    with io.open(file_path, 'r') as f:
+        output = f.readlines()
+
+    assert {'william', 'bill'} == set(map(str.strip, output))
