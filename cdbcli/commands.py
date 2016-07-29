@@ -270,9 +270,14 @@ def du(environment, couch_server, variables):
 
     for database in databases:
         db_info = database.info()
+
+        # Refer to http://docs.couchdb.org/en/latest/api/database/common.html#get--db
         docs_in_db = db_info['doc_count']
-        memory_used = db_info['disk_size']
-        environment.output('{}: \t {} documents in {} of memory'.format(database.name, docs_in_db, memory_used))
+        memory_used_by_docs = db_info['data_size']
+        memory_used_in_total = db_info['disk_size']
+
+        environment.output('{}: \t {} documents in {} bytes of memory, {} bytes in total'.format(
+            database.name, docs_in_db, memory_used_by_docs, memory_used_in_total))
 
     environment.output('')
 
