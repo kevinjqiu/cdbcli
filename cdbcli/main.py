@@ -57,7 +57,7 @@ class Config():
 @click.argument('database', default='', required=False)
 def main(host, port, username, password, askpass, tls, version, database):
     if version:
-        print_version()
+        print(get_version())
         exit()
 
     if askpass:
@@ -69,5 +69,5 @@ def main(host, port, username, password, askpass, tls, version, database):
     r.run()
 
 
-def print_version():
-    print('{} version {}'.format(os.path.basename(sys.argv[0]), cdbcli_version))
+def get_version():
+    return '{} version {}'.format(os.path.basename(sys.argv[0]), cdbcli_version)
