@@ -96,11 +96,11 @@ def cd(environment, couch_server, variables):
     database_name = variables.get('database_name')
     try:
         if not database_name or database_name == '/' or database_name == '..':
-            environment.current_db = None
+            environment.current_db, environment.previous_db = None, environment.current_db
         elif database_name == '-':
-            pass  # TODO: implement 'previous' database
+            environment.current_db, environment.previous_db = environment.previous_db, environment.current_db
         else:
-            environment.current_db = couch_server[database_name]
+            environment.current_db, environment.previous_db = couch_server[database_name], environment.current_db
     except (couchdb.ResourceNotFound, couchdb.ServerError):
         raise RuntimeError("Database '{}' does not exist".format(database_name))
 
@@ -132,6 +132,26 @@ def cat(environment, couch_server, variables):
         raise RuntimeError('Document not found')
 
     environment.output(highlight_json(doc))
+
+
+@command_handler('rm', '(?P<doc_id>[^\s]+)')
+@require_current_db
+def rm(environment, couch_server, variables):
+    """rm <doc_id>
+
+    Removes the document by its id.
+    """
+    doc_id = variables.get('doc_id')
+    if not doc_id:
+        raise RuntimeError('Document not found')
+
+    doc = environment.current_db.get(doc_id)
+    if not doc:
+        raise RuntimeError('Document not found')
+
+    environment.current_db.delete(doc)
+
+    environment.output('Deleted document {} '.format(doc_id))
 
 
 @command_handler('exec', '(?P<view_path>[^\s]+)')

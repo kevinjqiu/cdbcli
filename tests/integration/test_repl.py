@@ -87,6 +87,31 @@ def test_cd_slash_does_not_change_db_if_already_root(environment, couch_server):
     assert environment.current_db is None
 
 
+def test_cd_dash_switches_root_and_database(environment, couch_server):
+    environment.current_db = couch_server.create('test')
+    eval_(environment, couch_server, 'cd -')
+    assert environment.current_db is None
+    assert environment.previous_db.name == 'test'
+    eval_(environment, couch_server, 'cd -')
+    assert environment.current_db.name == 'test'
+    assert environment.previous_db is None
+
+
+def test_cd_dash_switches_databases(environment, couch_server):
+    environment.current_db = couch_server.create('test1')
+    environment.current_db = couch_server.create('test2')
+    eval_(environment, couch_server, 'cd test1')
+    assert environment.current_db.name == 'test1'
+    eval_(environment, couch_server, 'cd test2')
+    assert environment.current_db.name == 'test2'
+    eval_(environment, couch_server, 'cd -')
+    assert environment.current_db.name == 'test1'
+    assert environment.previous_db.name == 'test2'
+    eval_(environment, couch_server, 'cd -')
+    assert environment.current_db.name == 'test2'
+    assert environment.previous_db.name == 'test1'
+
+
 def test_ls_shows_all_dbs_if_no_current_db(environment, couch_server):
     eval_(environment, couch_server, 'ls')
     assert environment.current_db is None
@@ -301,3 +326,36 @@ def test_edit_fails_if_doc_is_not_json(environment, couch_server, mocker):
     _setup_edit_environment(environment, couch_server, mocker, 'this is not json')
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'vim ww')
+
+
+def test_rm_removes_the_document(environment, couch_server, mocker):
+    db = couch_server.create('test')
+    [db.save(get_user_doc(first_name, last_name))
+     for first_name, last_name in [('george', 'washington'),
+                                   ('thomas', 'jefferson'),
+                                   ('john', 'adams')]
+     ]
+    environment.current_db = db
+    eval_(environment, couch_server, 'rm george.washington')
+    assert environment.current_db is db
+    output = _get_output(environment)
+    assert 'Deleted document george.washington' == output.strip()
+
+
+def test_rm_raises_exception_if_doc_not_found(environment, couch_server, mocker):
+    db = couch_server.create('test')
+    [db.save(get_user_doc(first_name, last_name))
+     for first_name, last_name in [('george', 'washington'),
+                                   ('thomas', 'jefferson'),
+                                   ('john', 'adams')]
+     ]
+    environment.current_db = db
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'rm john.smith')
+
+
+def test_rm_raises_exception_if_no_doc_provided(environment, couch_server, mocker):
+    db = couch_server.create('test')
+    environment.current_db = db
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'rm')
