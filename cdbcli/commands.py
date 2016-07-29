@@ -248,7 +248,7 @@ def exit(environment, couch_server, variables):
     raise EOFError()
 
 
-def convert_bytes_to_human_readable(size_in_bytes):
+def _convert_bytes_to_human_readable(size_in_bytes):
     units = ['byte', 'KB', 'MB', 'GB', 'TB']
     unit_step = 0
     memory_amount = float(size_in_bytes)
@@ -276,8 +276,8 @@ def du(environment, couch_server, variables):
 
         # Refer to http://docs.couchdb.org/en/latest/api/database/common.html#get--db
         docs_in_db = db_info['doc_count']
-        memory_used_by_docs = convert_bytes_to_human_readable(db_info['data_size'])
-        memory_used_in_total = convert_bytes_to_human_readable(db_info['disk_size'])
+        memory_used_by_docs = _convert_bytes_to_human_readable(db_info['data_size'])
+        memory_used_in_total = _convert_bytes_to_human_readable(db_info['disk_size'])
 
         environment.output('{}: \t {} documents in {} of memory, {} in total'.format(
             database.name, docs_in_db, memory_used_by_docs, memory_used_in_total))

@@ -402,3 +402,35 @@ def test_pipe_error(environment, couch_server):
         # environment.output_stream should be reverted to its original state
         # if anything in the pipe fails
         assert environment.output_stream is f
+
+
+def test_du_command_no_database_selected(environment, couch_server):
+    couch_server.create('test')
+    _, file_path = tempfile.mkstemp()
+    with io.open(file_path, 'w') as f:
+        environment.output_stream = f
+        eval_(environment, couch_server, 'du')
+
+    with io.open(file_path, 'r') as f:
+        output = f.readlines()
+    assert '_replicator' in output[0]
+    assert '_users' in output[1]
+    assert 'test' in output[2]
+
+    # TODO: Test output
+    # _replicator:     1 documents in 1.96 KBs of memory, 4.10 KBs in total
+    # _users:          1 documents in 1.97 KBs of memory, 4.10 KBs in total
+    # database:        0 documents in 0.00 bytes of memory, 79.00 bytes in total
+
+
+def test_du_command_with_database_selected(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    _, file_path = tempfile.mkstemp()
+    with io.open(file_path, 'w') as f:
+        environment.output_stream = f
+        eval_(environment, couch_server, 'du')
+
+    with io.open(file_path, 'r') as f:
+        output = f.readlines()
+    assert 'test' in output[0]
