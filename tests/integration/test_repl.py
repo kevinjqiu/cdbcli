@@ -15,20 +15,6 @@ def _get_output(environment):
     return environment.output_stream.read()
 
 
-def _get_mock_highlight_json(mocker):
-    mock_highlight = mocker.patch('cdbcli.commands.highlighters.json')
-    mock_highlight.return_value = ''
-    return mock_highlight
-
-
-def _get_highlighted(mock_highlight):
-    args = [
-        c[0][0]
-        for c in mock_highlight.call_args_list
-    ]
-    return args
-
-
 def test_command_alias(environment, couch_server):
     @command_handler('abc', aliases=['duh', 'huh'])
     def abc(environment, couch_server):
@@ -222,9 +208,10 @@ def test_exec_view(environment, couch_server, mocker):
      ]
     db.save(get_user_design_doc())
     environment.current_db = db
-    mock_highlight = _get_mock_highlight_json(mocker)
+    environment.output = Mock()
     eval_(environment, couch_server, 'exec _design/users:by_lastname')
-    highlighted = _get_highlighted(mock_highlight)
+    highlighted = [json.loads(c[0][0]) for c in environment.output.call_args_list]
+
     expected = set(['washington', 'jefferson', 'adams'])
     actual = set([x['key'] for x in highlighted])
     assert expected == actual
