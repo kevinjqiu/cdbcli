@@ -200,6 +200,11 @@ def test_mkdir_creates_new_database(environment, couch_server):
     assert 'Created test' in output
 
 
+def test_mkdir_raises_exception_for_non_admin(environment, non_admin_couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, non_admin_couch_server, 'mkdir blah')
+
+
 def test_exec_requires_current_db(environment, couch_server):
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'exec blah')

@@ -8,6 +8,8 @@ from cdbcli.environment import Environment
 
 INTEGRATION_TEST_COUCHDB_URL = 'http://admin:password@localhost:5984/'
 
+INTEGRATION_TEST_NON_ADMIN_COUCHDB_URL = 'http://localhost:5984/'
+
 
 @pytest.fixture
 def environment():
@@ -23,6 +25,11 @@ def couch_server():
             del couch_server[db]
 
     return couch_server
+
+
+@pytest.fixture
+def non_admin_couch_server():
+    return couchdb.Server(INTEGRATION_TEST_NON_ADMIN_COUCHDB_URL)
 
 
 def get_user_doc(first_name=None, last_name=None):
