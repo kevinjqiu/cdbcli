@@ -256,6 +256,27 @@ def exit(environment, couch_server, variables):
     raise EOFError()
 
 
+@command_handler('du')
+def du(environment, couch_server, variables):
+    """du
+
+    Shows the number of documents and amount of memory they take up.
+    """
+    databases = [environment.current_db]
+
+    if not environment.current_db:
+        db_names = couch_server.resource.get_json('_all_dbs')[2]
+        databases = [couch_server[db] for db in db_names]
+
+    for database in databases:
+        db_info = database.info()
+        docs_in_db = db_info['doc_count']
+        memory_used = db_info['disk_size']
+        environment.output('{}: \t {} documents in {} of memory'.format(database.name, docs_in_db, memory_used))
+
+    environment.output('')
+
+
 def _save_doc_to_file(file_path, doc):
     with io.open(file_path, 'w', encoding='utf8') as fh:
         json.dump(doc, fh, sort_keys=True, indent=4)
