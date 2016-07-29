@@ -5,10 +5,8 @@ import traceback
 import tempfile
 
 import couchdb
-import pygments
-from pygments import lexers, formatters
 from collections import namedtuple
-from cdbcli import utils
+from cdbcli import utils, highlighters
 
 
 COMMANDS = {}
@@ -40,19 +38,6 @@ def require_current_db(fn):
 
         return fn(*args, **kwargs)
     return wrapper
-
-
-def highlight_json(json_object):
-    formatted_json = json.dumps(json_object, sort_keys=True, indent=4)
-    return pygments.highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
-
-
-def highlight_javascript(code):
-    return pygments.highlight(code, lexers.JavascriptLexer(), formatters.TerminalFormatter())
-
-
-def highlight_python(code):
-    return pygments.highlight(code, lexers.PythonLexer(), formatters.TerminalFormatter())
 
 
 def get_all_dbs(environment, couch_server):
@@ -113,7 +98,7 @@ def info(environment, couch_server, variables):
     Show the information of the current database.
     """
     info = environment.current_db.info()
-    environment.output(highlight_json(info))
+    environment.output(info, highlighters.json)
 
 
 @command_handler('cat', '(?P<doc_id>[^\s]+)')
@@ -131,7 +116,7 @@ def cat(environment, couch_server, variables):
     if not doc:
         raise RuntimeError('Document not found')
 
-    environment.output(highlight_json(doc))
+    environment.output(doc, highlighters.json)
 
 
 @command_handler('rm', '(?P<doc_id>[^\s]+)')
@@ -170,7 +155,7 @@ def exec_(environment, couch_server, variables):
 
     try:
         for result in environment.current_db.view('{}/_view/{}'.format(view_id, view_name)):
-            environment.output(highlight_json(dict(result.items())))
+            environment.output(dict(result.items()), highlighters.json)
     except:
         traceback.print_exc()
         raise RuntimeError('Unable to exec view: {}'.format(view_id))
@@ -209,8 +194,8 @@ def lv(environment, couch_server, variables):
     language = view_doc.get('language', 'javascript')
 
     highlighter = {
-        'python': highlight_python,
-        'javascript': highlight_javascript,
+        'python': highlighters.python,
+        'javascript': highlighters.javascript,
         None: lambda x: x
     }.get(language)
 

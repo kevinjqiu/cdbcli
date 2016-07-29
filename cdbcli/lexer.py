@@ -1,4 +1,3 @@
-import re
 import shlex
 
 from prompt_toolkit.contrib.regular_languages.lexer import GrammarLexer

@@ -16,7 +16,7 @@ def _get_output(environment):
 
 
 def _get_mock_highlight_json(mocker):
-    mock_highlight = mocker.patch('cdbcli.commands.highlight_json')
+    mock_highlight = mocker.patch('cdbcli.commands.highlighters.json')
     mock_highlight.return_value = ''
     return mock_highlight
 

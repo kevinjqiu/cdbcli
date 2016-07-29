@@ -11,8 +11,14 @@ class Environment():
         self.cli = None
         self.previous_db = None
 
-    def output(self, text):
-        output = "{}\n".format(text)
+    def output(self, text, highlighter=None):
+        """Send text to the environment's output stream.
+        :param text: the text to output
+        :param highlighter: an optional function to colourize the text
+        """
+        highlighter = highlighter or (lambda x: x)
+        highlighted = highlighter(text)
+        output = "{}\n".format(highlighted)
         if isinstance(self.output_stream, io.BufferedIOBase):
             output = bytes(output, encoding='utf-8')
 
