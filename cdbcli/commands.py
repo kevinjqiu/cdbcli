@@ -182,7 +182,7 @@ def mkdir(environment, couch_server, variables):
     try:
         couch_server.create(database_name)
     except couchdb.Unauthorized as e:
-        raise RuntimeError(e)
+        raise RuntimeError(str(e))
     environment.output('Created {}'.format(database_name))
 
 
