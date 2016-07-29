@@ -42,9 +42,6 @@ def eval_(environment, couch_server, command_text):
     if command not in COMMANDS:
         raise RuntimeError('{}: command not found'.format(cli_command))
 
-    for shell_command in shell_commands:
-        functools.partial(subprocess.run, shlex.split(shell_command), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-
     handler, _, _ = COMMANDS[command]
     with environment.handle_pipes(shell_command) as environment:
         handler(environment=environment, couch_server=couch_server, variables=m.variables())
