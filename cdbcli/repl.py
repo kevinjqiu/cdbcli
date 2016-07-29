@@ -43,7 +43,7 @@ def eval_(environment, couch_server, command_text):
         raise RuntimeError('{}: command not found'.format(cli_command))
 
     handler, _, _ = COMMANDS[command]
-    with environment.handle_pipes(shell_command) as environment:
+    with environment.pipe(shell_commands) as environment:
         handler(environment=environment, couch_server=couch_server, variables=m.variables())
 
 

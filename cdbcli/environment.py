@@ -1,5 +1,7 @@
-import sys
 import contextlib
+import shlex
+import subprocess
+import sys
 
 
 class Environment():
@@ -7,27 +9,47 @@ class Environment():
         self.current_db = current_db
         self.output_stream = output_stream
         self.cli = None
-        self.pipes = []
 
     def output(self, text):
-        self.output_stream.write(text)
-        self.output_stream.write('\n')
-        self.output_stream.flush()
+        if hasattr(self.output_stream, 'buffer'):
+            buffer = self.output_stream.buffer
+        else:
+            buffer = self.output_stream
+
+        buffer.write(bytes(text, encoding='utf-8'))
+        buffer.write(bytes('\n', encoding='utf-8'))
+        buffer.flush()
 
     def run_in_terminal(self, func, render_cli_done=False):
         assert self.cli, 'No CLI has been set'
         return self.cli.run_in_terminal(func, render_cli_done)
 
     @contextlib.contextmanager
-    def handle_pipes(self, pipes):
-        self.pipes = pipes
+    def pipe(self, shell_commands):
+        prev_output_stream = self.output_stream
 
-        subprocesses = []
-        for shell_command in pipes:
-            subprocesses.append(subprocess.run(shlex.split(shell_command),
-                                               stdin=subprocess.PIPE, stdout=subprocess.PIPE))
+        subprocs = []
+        for i, shell_command in enumerate(shell_commands):
+            if i == len(shell_commands) -1:
+                stdout = prev_output_stream
+            else:
+                stdout = subprocess.PIPE
 
+            if i == 0:
+                stdin = subprocess.PIPE
+            else:
+                stdin = subprocs[i - 1].stdin
+
+            process = subprocess.Popen(shlex.split(shell_command),
+                                    stdin=stdin,
+                                    stdout=stdout)
+            subprocs.append(process)
+
+        if subprocs:
+            self.output_stream = subprocs[0].stdin
         try:
             yield self
+            if subprocs:
+                subprocs[-1].communicate()
         finally:
-            self.pipes = []
+            self.output_stream = prev_output_stream
