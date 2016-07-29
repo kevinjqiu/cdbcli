@@ -14,6 +14,7 @@ lexer = GrammarLexer(grammar, lexers={
     'database_name': SimpleLexer(Token.Operand),
 })
 
+
 def split_cli_command_and_shell_commands(command_text):
     """Split the command text into cli commands and pipes
 

@@ -1,6 +1,3 @@
-import functools
-import subprocess
-
 import couchdb
 import prompt_toolkit as pt
 

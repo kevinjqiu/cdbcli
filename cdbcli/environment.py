@@ -1,4 +1,5 @@
 import contextlib
+import io
 import shlex
 import subprocess
 import sys
@@ -11,14 +12,12 @@ class Environment():
         self.cli = None
 
     def output(self, text):
-        if hasattr(self.output_stream, 'buffer'):
-            buffer = self.output_stream.buffer
-        else:
-            buffer = self.output_stream
+        output = "{}\n".format(text)
+        if isinstance(self.output_stream, io.BufferedIOBase):
+            output = bytes(output, encoding='utf-8')
 
-        buffer.write(bytes(text, encoding='utf-8'))
-        buffer.write(bytes('\n', encoding='utf-8'))
-        buffer.flush()
+        self.output_stream.write(output)
+        self.output_stream.flush()
 
     def run_in_terminal(self, func, render_cli_done=False):
         assert self.cli, 'No CLI has been set'
