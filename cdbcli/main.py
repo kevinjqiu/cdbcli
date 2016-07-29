@@ -1,5 +1,7 @@
 import couchdb
 import click
+import sys
+import os
 
 from cdbcli import repl
 from cdbcli import __version__ as cdbcli_version
@@ -56,6 +58,7 @@ class Config():
 def main(host, port, username, password, askpass, tls, version, database):
     if version:
         print_version()
+        exit()
 
     if askpass:
         password = prompt('Enter password: ', is_password=True)
@@ -67,7 +70,4 @@ def main(host, port, username, password, askpass, tls, version, database):
 
 
 def print_version():
-    import sys
-    import os
     print('{} version {}'.format(os.path.basename(sys.argv[0]), cdbcli_version))
-    exit()
