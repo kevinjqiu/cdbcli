@@ -1,8 +1,10 @@
 import setuptools
+import cdbcli
+
 
 setuptools.setup(
     name="cdbcli",
-    version="0.1.1",
+    version=cdbcli.__version__,
     url="https://github.com/kevinjqiu/cdbcli",
 
     author="Kevin J. Qiu",
