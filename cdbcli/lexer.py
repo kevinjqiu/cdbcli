@@ -30,16 +30,14 @@ def split_cli_command_and_shell_commands(command_text):
     parts = []
     stack = []
     for token in tokens:
-        # TODO: this is probably not the best way to parse shell commands
         if token != '|':
             stack.append(token)
         else:
-            parts.append(list(stack))
-            stack.clear()
+            parts.append(stack)
+            stack = []
 
     if stack:
-        parts.append(list(stack))
-        stack.clear()
+        parts.append(stack)
 
     if len(parts) == 1:
         return ' '.join(parts[0]), []
