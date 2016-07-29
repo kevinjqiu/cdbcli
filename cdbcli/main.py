@@ -6,7 +6,7 @@ from cdbcli import repl
 from prompt_toolkit import prompt
 
 
-class Config(object):
+class Config():
     def __init__(self, host, port, username, password, tls, database):
         self.__host = host
         self.__port = port
