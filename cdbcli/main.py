@@ -6,7 +6,7 @@ from cdbcli import repl
 from prompt_toolkit import prompt
 
 
-class Config(object):
+class Config():
     def __init__(self, host, port, username, password, tls, database):
         self.__host = host
         self.__port = port
@@ -45,7 +45,7 @@ class Config(object):
 
 @click.command()
 @click.option('-h', '--host', default='localhost', help='The host of the couchdb instance')
-@click.option('--port', default='5984', help='The port of the coouchdb instance')
+@click.option('--port', default='5984', help='The port of the couchdb instance')
 @click.option('-u', '--username', default='admin', help='The username to connect as')
 @click.option('-p', '--password', default=None, help='The password')
 @click.option('-P', '--askpass/--no-askpass', default=False, help='Ask for password?')

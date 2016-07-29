@@ -15,25 +15,11 @@ def _get_output(environment):
     return environment.output_stream.read()
 
 
-def _get_mock_highlight_json(mocker):
-    mock_highlight = mocker.patch('cdbcli.commands.highlight_json')
-    mock_highlight.return_value = ''
-    return mock_highlight
-
-
-def _get_highlighted(mock_highlight):
-    args = [
-        c[0][0]
-        for c in mock_highlight.call_args_list
-    ]
-    return args
-
-
 def test_command_alias(environment, couch_server):
     @command_handler('abc', aliases=['duh', 'huh'])
     def abc(environment, couch_server):
         """Blah blah"""
-        environment.output('Done.')
+        pass  # pragma: nocover
 
     assert 'abc' in COMMANDS
     handler = COMMANDS['abc']
@@ -200,6 +186,11 @@ def test_mkdir_creates_new_database(environment, couch_server):
     assert 'Created test' in output
 
 
+def test_mkdir_raises_exception_for_non_admin(environment, non_admin_couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, non_admin_couch_server, 'mkdir blah')
+
+
 def test_exec_requires_current_db(environment, couch_server):
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'exec blah')
@@ -222,9 +213,10 @@ def test_exec_view(environment, couch_server, mocker):
      ]
     db.save(get_user_design_doc())
     environment.current_db = db
-    mock_highlight = _get_mock_highlight_json(mocker)
+    environment.output = Mock()
     eval_(environment, couch_server, 'exec _design/users:by_lastname')
-    highlighted = _get_highlighted(mock_highlight)
+    highlighted = [json.loads(c[0][0]) for c in environment.output.call_args_list]
+
     expected = set(['washington', 'jefferson', 'adams'])
     actual = set([x['key'] for x in highlighted])
     assert expected == actual
@@ -328,7 +320,7 @@ def test_edit_fails_if_doc_is_not_json(environment, couch_server, mocker):
         eval_(environment, couch_server, 'vim ww')
 
 
-def test_rm_removes_the_document(environment, couch_server, mocker):
+def test_rm_removes_the_document(environment, couch_server):
     db = couch_server.create('test')
     [db.save(get_user_doc(first_name, last_name))
      for first_name, last_name in [('george', 'washington'),
@@ -342,7 +334,7 @@ def test_rm_removes_the_document(environment, couch_server, mocker):
     assert 'Deleted document george.washington' == output.strip()
 
 
-def test_rm_raises_exception_if_doc_not_found(environment, couch_server, mocker):
+def test_rm_raises_exception_if_doc_not_found(environment, couch_server):
     db = couch_server.create('test')
     [db.save(get_user_doc(first_name, last_name))
      for first_name, last_name in [('george', 'washington'),
@@ -354,8 +346,59 @@ def test_rm_raises_exception_if_doc_not_found(environment, couch_server, mocker)
         eval_(environment, couch_server, 'rm john.smith')
 
 
-def test_rm_raises_exception_if_no_doc_provided(environment, couch_server, mocker):
+def test_rm_raises_exception_if_no_doc_provided(environment, couch_server):
     db = couch_server.create('test')
     environment.current_db = db
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'rm')
+
+
+def test_pipe_commands_one_pipe(environment, couch_server):
+    db = couch_server.create('test')
+    [db.save(get_user_doc(first_name, last_name))
+     for first_name, last_name in [('william', 'shakespear'),
+                                   ('william', 'shatner'),
+                                   ('bill', 'gates')]
+     ]
+    environment.current_db = db
+    _, file_path = tempfile.mkstemp()
+    with io.open(file_path, 'w') as f:
+        environment.output_stream = f
+        eval_(environment, couch_server, 'ls | grep william')
+
+    with io.open(file_path, 'r') as f:
+        output = f.readlines()
+    assert 'william.shakespear' in output[0]
+    assert 'william.shatner' in output[1]
+
+
+def test_pipe_commands_multiple_pipes(environment, couch_server):
+    db = couch_server.create('test')
+    [db.save(get_user_doc(first_name, last_name))
+     for first_name, last_name in [('william', 'shakespear'),
+                                   ('william', 'shatner'),
+                                   ('bill', 'gates')]
+     ]
+    environment.current_db = db
+    _, file_path = tempfile.mkstemp()
+    with io.open(file_path, 'w') as f:
+        environment.output_stream = f
+        eval_(environment, couch_server, 'ls | cut -d " " -f 2 | cut -d "." -f 1 | sort | uniq')
+
+    with io.open(file_path, 'r') as f:
+        output = f.readlines()
+
+    assert {'william', 'bill'} == set(map(str.strip, output))
+
+
+def test_pipe_error(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    _, file_path = tempfile.mkstemp()
+    with io.open(file_path, 'w') as f:
+        environment.output_stream = f
+        with pytest.raises(RuntimeError):
+            eval_(environment, couch_server, 'ls | command_not_found')
+        # environment.output_stream should be reverted to its original state
+        # if anything in the pipe fails
+        assert environment.output_stream is f

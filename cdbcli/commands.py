@@ -5,10 +5,8 @@ import traceback
 import tempfile
 
 import couchdb
-import pygments
-from pygments import lexers, formatters
 from collections import namedtuple
-from cdbcli import utils
+from cdbcli import utils, highlighters
 
 
 COMMANDS = {}
@@ -42,19 +40,6 @@ def require_current_db(fn):
     return wrapper
 
 
-def highlight_json(json_object):
-    formatted_json = json.dumps(json_object, sort_keys=True, indent=4)
-    return pygments.highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
-
-
-def highlight_javascript(code):
-    return pygments.highlight(code, lexers.JavascriptLexer(), formatters.TerminalFormatter())
-
-
-def highlight_python(code):
-    return pygments.highlight(code, lexers.PythonLexer(), formatters.TerminalFormatter())
-
-
 def get_all_dbs(environment, couch_server):
     status_code, _, response = couch_server.resource.get_json('_all_dbs')
 
@@ -66,6 +51,10 @@ def get_all_dbs(environment, couch_server):
 
 def is_view(doc):
     return doc.startswith('_design/')
+
+
+def json_dumps(json_object):
+    return json.dumps(json_object, sort_keys=True, indent=4)
 
 
 @command_handler('ls')
@@ -113,7 +102,7 @@ def info(environment, couch_server, variables):
     Show the information of the current database.
     """
     info = environment.current_db.info()
-    environment.output(highlight_json(info))
+    environment.output(json_dumps(info), highlighters.json)
 
 
 @command_handler('cat', '(?P<doc_id>[^\s]+)')
@@ -131,7 +120,7 @@ def cat(environment, couch_server, variables):
     if not doc:
         raise RuntimeError('Document not found')
 
-    environment.output(highlight_json(doc))
+    environment.output(json_dumps(doc), highlighters.json)
 
 
 @command_handler('rm', '(?P<doc_id>[^\s]+)')
@@ -170,7 +159,7 @@ def exec_(environment, couch_server, variables):
 
     try:
         for result in environment.current_db.view('{}/_view/{}'.format(view_id, view_name)):
-            environment.output(highlight_json(dict(result.items())))
+            environment.output(json_dumps(dict(result.items())), highlighters.json)
     except:
         traceback.print_exc()
         raise RuntimeError('Unable to exec view: {}'.format(view_id))
@@ -190,7 +179,10 @@ def mkdir(environment, couch_server, variables):
     if database_name in couch_server:
         raise RuntimeError('Database {} already exists'.format(database_name))
 
-    couch_server.create(database_name)
+    try:
+        couch_server.create(database_name)
+    except couchdb.Unauthorized as e:
+        raise RuntimeError(str(e))
     environment.output('Created {}'.format(database_name))
 
 
@@ -209,8 +201,8 @@ def lv(environment, couch_server, variables):
     language = view_doc.get('language', 'javascript')
 
     highlighter = {
-        'python': highlight_python,
-        'javascript': highlight_javascript,
+        'python': highlighters.python,
+        'javascript': highlighters.javascript,
         None: lambda x: x
     }.get(language)
 
