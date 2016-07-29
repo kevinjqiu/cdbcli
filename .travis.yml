@@ -4,6 +4,7 @@ services:
 language: python
 env:
     - TOXENV=py35
+    - TOXENV=py34
 install:
     - pip install tox
     - pip install -r requirements-docs.txt
