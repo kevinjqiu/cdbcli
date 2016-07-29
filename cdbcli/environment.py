@@ -30,7 +30,7 @@ class Environment():
 
         subprocs = []
         for i, shell_command in enumerate(shell_commands):
-            if i == len(shell_commands) -1:
+            if i == len(shell_commands) - 1:
                 stdout = prev_output_stream
             else:
                 stdout = subprocess.PIPE
@@ -38,18 +38,19 @@ class Environment():
             if i == 0:
                 stdin = subprocess.PIPE
             else:
-                stdin = subprocs[i - 1].stdin
+                stdin = subprocs[i - 1].stdout
 
             process = subprocess.Popen(shlex.split(shell_command),
-                                    stdin=stdin,
-                                    stdout=stdout)
+                                       stdin=stdin,
+                                       stdout=stdout)
             subprocs.append(process)
 
         if subprocs:
             self.output_stream = subprocs[0].stdin
+
         try:
             yield self
             if subprocs:
-                subprocs[-1].communicate()
+                subprocs[0].communicate()
         finally:
             self.output_stream = prev_output_stream
