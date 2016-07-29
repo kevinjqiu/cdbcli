@@ -134,6 +134,26 @@ def cat(environment, couch_server, variables):
     environment.output(highlight_json(doc))
 
 
+@command_handler('rm', '(?P<doc_id>[^\s]+)')
+@require_current_db
+def rm(environment, couch_server, variables):
+    """rm <doc_id>
+
+    Removes the document by its id.
+    """
+    doc_id = variables.get('doc_id')
+    if not doc_id:
+        raise RuntimeError('Document not found')
+
+    doc = environment.current_db.get(doc_id)
+    if not doc:
+        raise RuntimeError('Document not found')
+
+    environment.current_db.delete(doc)
+
+    environment.output('Deleted document {} '.format(doc_id))
+
+
 @command_handler('exec', '(?P<view_path>[^\s]+)')
 @require_current_db
 def exec_(environment, couch_server, variables):
