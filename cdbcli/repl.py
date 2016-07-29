@@ -1,6 +1,7 @@
 import couchdb
 import prompt_toolkit as pt
 
+from cdbcli import __version__ as cdbcli_version
 from prompt_toolkit import history, shortcuts
 from .lexer import lexer, split_cli_command_and_shell_commands
 from .completer import get_completer
@@ -16,7 +17,7 @@ BANNER = """
     ( (__  )(_) )) _ <( (__  )(__  _)(_
      \___)(____/(____/ \___)(____)(____)
 
-    Welcome to cdbcli
+    Welcome to cdbcli {cdbcli_version}
     CouchDB version: {couchdb_version}
 
     Press <TAB> for command auto-completion
@@ -68,7 +69,8 @@ class Repl():
                                                        database=database)
 
     def _hello(self):
-        message = BANNER.format(couchdb_version=self._couch_server.version())
+        message = BANNER.format(cdbcli_version=cdbcli_version,
+                                couchdb_version=self._couch_server.version())
         self._environment.output(message)
 
     def _run(self):
