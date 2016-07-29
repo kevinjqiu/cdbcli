@@ -263,7 +263,7 @@ def _convert_bytes_to_human_readable(size_in_bytes):
 def du(environment, couch_server, variables):
     """du
 
-    Shows the number of documents and amount of memory they take up.
+    Shows the number of documents and amount of disk space they take up.
     """
     databases = [environment.current_db]
 
@@ -276,11 +276,8 @@ def du(environment, couch_server, variables):
 
         # Refer to http://docs.couchdb.org/en/latest/api/database/common.html#get--db
         docs_in_db = db_info['doc_count']
-        memory_used_by_docs = _convert_bytes_to_human_readable(db_info['data_size'])
-        memory_used_in_total = _convert_bytes_to_human_readable(db_info['disk_size'])
-
-        environment.output('{}: \t {} documents in {} of memory, {} in total'.format(
-            database.name, docs_in_db, memory_used_by_docs, memory_used_in_total))
+        total_usage = _convert_bytes_to_human_readable(db_info['disk_size'])
+        environment.output('{:<16}{:<24}({} documents)'.format(total_usage, database.name, docs_in_db))
 
     environment.output('')
 
