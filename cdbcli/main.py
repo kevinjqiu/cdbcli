@@ -58,7 +58,7 @@ class Config():
 def main(host, port, username, password, askpass, tls, version, database):
     if version:
         print(get_version())
-        exit()
+        sys.exit(0)
 
     if askpass:
         password = prompt('Enter password: ', is_password=True)
