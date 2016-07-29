@@ -179,7 +179,10 @@ def mkdir(environment, couch_server, variables):
     if database_name in couch_server:
         raise RuntimeError('Database {} already exists'.format(database_name))
 
-    couch_server.create(database_name)
+    try:
+        couch_server.create(database_name)
+    except couchdb.Unauthorized as e:
+        raise RuntimeError(e)
     environment.output('Created {}'.format(database_name))
 
 
