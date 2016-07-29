@@ -53,6 +53,10 @@ def is_view(doc):
     return doc.startswith('_design/')
 
 
+def json_dumps(json_object):
+    return json.dumps(json_object, sort_keys=True, indent=4)
+
+
 @command_handler('ls')
 def ls(environment, couch_server, variables):
     """ls
@@ -98,7 +102,7 @@ def info(environment, couch_server, variables):
     Show the information of the current database.
     """
     info = environment.current_db.info()
-    environment.output(info, highlighters.json)
+    environment.output(json_dumps(info), highlighters.json)
 
 
 @command_handler('cat', '(?P<doc_id>[^\s]+)')
@@ -116,7 +120,7 @@ def cat(environment, couch_server, variables):
     if not doc:
         raise RuntimeError('Document not found')
 
-    environment.output(doc, highlighters.json)
+    environment.output(json_dumps(doc), highlighters.json)
 
 
 @command_handler('rm', '(?P<doc_id>[^\s]+)')
@@ -155,7 +159,7 @@ def exec_(environment, couch_server, variables):
 
     try:
         for result in environment.current_db.view('{}/_view/{}'.format(view_id, view_name)):
-            environment.output(dict(result.items()), highlighters.json)
+            environment.output(json_dumps(dict(result.items())), highlighters.json)
     except:
         traceback.print_exc()
         raise RuntimeError('Unable to exec view: {}'.format(view_id))
