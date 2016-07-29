@@ -33,7 +33,7 @@ def test_command_alias(environment, couch_server):
     @command_handler('abc', aliases=['duh', 'huh'])
     def abc(environment, couch_server):
         """Blah blah"""
-        environment.output('Done.')
+        pass  # pragma: nocover
 
     assert 'abc' in COMMANDS
     handler = COMMANDS['abc']
