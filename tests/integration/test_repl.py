@@ -326,3 +326,29 @@ def test_edit_fails_if_doc_is_not_json(environment, couch_server, mocker):
     _setup_edit_environment(environment, couch_server, mocker, 'this is not json')
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'vim ww')
+
+
+def test_rm_removes_the_document(environment, couch_server, mocker):
+    db = couch_server.create('test')
+    [db.save(get_user_doc(first_name, last_name))
+     for first_name, last_name in [('george', 'washington'),
+                                   ('thomas', 'jefferson'),
+                                   ('john', 'adams')]
+     ]
+    environment.current_db = db
+    eval_(environment, couch_server, 'rm george.washington')
+    assert environment.current_db is db
+    output = _get_output(environment)
+    assert 'Deleted document george.washington' == output.strip()
+
+
+def test_rm_raises_exception_if_doc_not_found(environment, couch_server, mocker):
+    db = couch_server.create('test')
+    [db.save(get_user_doc(first_name, last_name))
+     for first_name, last_name in [('george', 'washington'),
+                                   ('thomas', 'jefferson'),
+                                   ('john', 'adams')]
+     ]
+    environment.current_db = db
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'rm john.smith')
