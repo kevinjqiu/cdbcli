@@ -41,14 +41,14 @@ def split_cli_command_and_shell_commands(command_text):
             else:
                 stack.append(token)
         else:
-            parts.append(' '.join(stack))
+            parts.append(list(stack))
             stack.clear()
 
     if stack:
-        parts.append(' '.join(stack))
+        parts.append(list(stack))
         stack.clear()
 
     if len(parts) == 1:
-        return parts[0], []
+        return ' '.join(parts[0]), []
 
-    return parts[0], parts[1:]
+    return ' '.join(parts[0]), parts[1:]

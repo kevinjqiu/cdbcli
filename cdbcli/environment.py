@@ -1,6 +1,5 @@
 import contextlib
 import io
-import shlex
 import subprocess
 import sys
 
@@ -39,9 +38,7 @@ class Environment():
             else:
                 stdin = subprocs[i - 1].stdout
 
-            process = subprocess.Popen(shlex.split(shell_command),
-                                       stdin=stdin,
-                                       stdout=stdout)
+            process = subprocess.Popen(shell_command, stdin=stdin, stdout=stdout)
             subprocs.append(process)
 
         if subprocs:
