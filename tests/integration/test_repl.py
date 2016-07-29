@@ -367,7 +367,7 @@ def test_pipe_commands_one_pipe(environment, couch_server):
     assert 'william.shatner' in output[1]
 
 
-def test_pip_commands_multiple_pipes(environment, couch_server):
+def test_pipe_commands_multiple_pipes(environment, couch_server):
     db = couch_server.create('test')
     [db.save(get_user_doc(first_name, last_name))
      for first_name, last_name in [('william', 'shakespear'),
@@ -384,3 +384,16 @@ def test_pip_commands_multiple_pipes(environment, couch_server):
         output = f.readlines()
 
     assert {'william', 'bill'} == set(map(str.strip, output))
+
+
+def test_pipe_error(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    _, file_path = tempfile.mkstemp()
+    with io.open(file_path, 'w') as f:
+        environment.output_stream = f
+        with pytest.raises(RuntimeError):
+            eval_(environment, couch_server, 'ls | command_not_found')
+        # environment.output_stream should be reverted to its original state
+        # if anything in the pipe fails
+        assert environment.output_stream is f

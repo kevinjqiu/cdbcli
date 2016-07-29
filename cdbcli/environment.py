@@ -31,14 +31,12 @@ class Environment():
         assert self.cli, 'No CLI has been set'
         return self.cli.run_in_terminal(func, render_cli_done)
 
-    @contextlib.contextmanager
-    def pipe(self, shell_commands):
-        prev_output_stream = self.output_stream
-
+    @classmethod
+    def _create_piped_subprocs(cls, shell_commands, final_stdout):
         subprocs = []
         for i, shell_command in enumerate(shell_commands):
             if i == len(shell_commands) - 1:
-                stdout = prev_output_stream
+                stdout = final_stdout
             else:
                 stdout = subprocess.PIPE
 
@@ -47,14 +45,25 @@ class Environment():
             else:
                 stdin = subprocs[i - 1].stdout
 
-            process = subprocess.Popen(shell_command, stdin=stdin, stdout=stdout, stderr=sys.stderr)
-            subprocs.append(process)
+            try:
+                process = subprocess.Popen(shell_command, stdin=stdin, stdout=stdout, stderr=sys.stderr)
+            except OSError as e:
+                raise RuntimeError(str(e))
+            else:
+                subprocs.append(process)
 
-        if subprocs:
-            self.has_pipe = True
-            self.output_stream = subprocs[0].stdin
+        return subprocs
+
+    @contextlib.contextmanager
+    def pipe(self, shell_commands):
+        prev_output_stream = self.output_stream
 
         try:
+            subprocs = self._create_piped_subprocs(shell_commands, prev_output_stream)
+            if subprocs:
+                self.has_pipe = True
+                self.output_stream = subprocs[0].stdin
+
             yield self
             if subprocs:
                 subprocs[0].communicate()
