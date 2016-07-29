@@ -10,15 +10,17 @@ class Environment():
         self.output_stream = output_stream
         self.cli = None
         self.previous_db = None
+        self.has_pipe = False
 
     def output(self, text, highlighter=None):
         """Send text to the environment's output stream.
         :param text: the text to output
         :param highlighter: an optional function to colourize the text
         """
-        highlighter = highlighter or (lambda x: x)
-        highlighted = highlighter(text)
-        output = "{}\n".format(highlighted)
+        if not self.has_pipe:  # only colourize when the output is not piped
+            highlighter = highlighter or (lambda x: x)
+            text = highlighter(text)
+        output = "{}\n".format(text)
         if isinstance(self.output_stream, io.BufferedIOBase):
             output = bytes(output, encoding='utf-8')
 
@@ -49,6 +51,7 @@ class Environment():
             subprocs.append(process)
 
         if subprocs:
+            self.has_pipe = True
             self.output_stream = subprocs[0].stdin
 
         try:
@@ -57,3 +60,4 @@ class Environment():
                 subprocs[0].communicate()
         finally:
             self.output_stream = prev_output_stream
+            self.has_pipe = False
