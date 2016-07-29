@@ -9,7 +9,7 @@ cdbcli
    :target: https://travis-ci.org/kevinjqiu/cdbcli
    :alt: Latest Travis CI build status
 
-The interactive CLI for CouchDB
+The interactive shell for CouchDB
 
 Usage
 -----
