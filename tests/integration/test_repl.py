@@ -352,3 +352,10 @@ def test_rm_raises_exception_if_doc_not_found(environment, couch_server, mocker)
     environment.current_db = db
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'rm john.smith')
+
+
+def test_rm_raises_exception_if_no_doc_provided(environment, couch_server, mocker):
+    db = couch_server.create('test')
+    environment.current_db = db
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'rm')
