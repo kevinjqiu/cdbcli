@@ -81,20 +81,6 @@ You will be greeted by the cdbcli's splash screen::
 
     admin@yourdomain/>
 
-
-``cd <database>``
-^^^^^^^^^^^^^^^^^
-
-Change database is achieved by using the ``cd`` command::
-
-    admin@yourdomain/> cd test
-    admin@yourdomain/test>
-
-Use ``cd ..`` or ``cd /`` to go back to the root of the database::
-
-    admin@yourdomain/test> cd /
-    admin@yourdomain/>
-
 Installation
 ------------
 
@@ -124,7 +110,7 @@ Contributing to Documentation
 Licence
 -------
 
-cdbcli is licensed under Apache 2.0
+``cdbcli`` is licensed under Apache 2.0
 
 
 Authors
