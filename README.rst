@@ -9,6 +9,10 @@ cdbcli - CouchDB Interactive Shell
    :target: https://travis-ci.org/kevinjqiu/cdbcli
    :alt: Latest Travis CI build status for master
 
+.. image:: https://coveralls.io/repos/github/kevinjqiu/cdbcli/badge.svg
+   :target: https://coveralls.io/github/kevinjqiu/cdbcli
+   :alt: Code Coverage
+
 .. image:: https://img.shields.io/badge/license-Apache%202.0-blue.svg
    :target: LICENSE
    :alt: License
