@@ -1,5 +1,7 @@
 .PHONY: tests docs
 
+REPO=kevinjqiu/cdbcli
+
 start_couchdb:
 	.travis/start-couchdb.sh
 
@@ -18,3 +20,5 @@ docs: clean_docs
 clean_docs:
 	rm docs/build -rvf
 
+build_docker:
+	docker build -t $(REPO) .
