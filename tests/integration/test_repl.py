@@ -22,7 +22,7 @@ def _get_pipe_output(pipe_output_temp_file_path, expect_empty_output=False):
         output = f.readlines()
         if expect_empty_output:
             assert len(output) == 0
-        else:
+        else:  # pragma: nocover
             assert len(output) != 0
         return output
 
