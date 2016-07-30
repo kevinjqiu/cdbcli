@@ -79,9 +79,10 @@ You will be greeted by the cdbcli's splash screen::
         ( (__  )(_) )) _ <( (__  )(__  _)(_
          \___)(____/(____/ \___)(____)(____)
 
-        Welcome to cdbcli
+        Welcome to cdbcli 0.1.1
         CouchDB version: 1.5.0
 
+        Type 'help' or 'man' to get a list of all supported commands
         Press <TAB> for command auto-completion
         Press Ctrl+C or Ctrl+D or type 'exit' to exit
 
