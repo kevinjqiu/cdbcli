@@ -412,7 +412,20 @@ def test_pipe_commands_command_error(environment, couch_server):
     _, file_path = tempfile.mkstemp()
     with io.open(file_path, 'w') as f:
         environment.output_stream = f
+        # TODO: expect BrokenPipeError
         eval_(environment, couch_server, 'ls | grep')
+
+    _get_pipe_output(file_path, expect_empty_output=True)
+
+
+def test_pipe_commands_error_in_pipe(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    _, file_path = tempfile.mkstemp()
+    with io.open(file_path, 'w') as f:
+        environment.output_stream = f
+        # TODO: expect BrokenPipeError
+        eval_(environment, couch_server, 'ls | grep | grep hello')
 
     _get_pipe_output(file_path, expect_empty_output=True)
 
