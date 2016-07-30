@@ -45,12 +45,8 @@ class Environment():
             else:
                 stdin = subprocs[i - 1].stdout
 
-            try:
-                process = subprocess.Popen(shell_command, stdin=stdin, stdout=stdout, stderr=sys.stderr)
-            except OSError as e:
-                raise RuntimeError(str(e))
-            else:
-                subprocs.append(process)
+            process = subprocess.Popen(shell_command, stdin=stdin, stdout=stdout, stderr=sys.stderr)
+            subprocs.append(process)
 
         return subprocs
 
@@ -67,6 +63,8 @@ class Environment():
             yield self
             if subprocs:
                 subprocs[0].communicate()
+        except (IOError, OSError) as e:
+            raise RuntimeError(str(e))
         finally:
             self.output_stream = prev_output_stream
             self.has_pipe = False
