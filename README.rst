@@ -10,7 +10,7 @@ cdbcli
    :alt: Latest Travis CI build status for master
 
 .. image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000
-   :target:
+   :target: LICENSE
    :alt: License
 
 The interactive shell for CouchDB
