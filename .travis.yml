@@ -8,6 +8,7 @@ env:
 install:
     - pip install tox
     - pip install -r requirements-test.txt
+    - pip install -r requirements-docs.txt
 before_script:
     make start_couchdb 
 script:
