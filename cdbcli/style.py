@@ -3,6 +3,6 @@ from prompt_toolkit.token import Token
 
 
 style = style_from_dict({
-    Token.Command: '#33aa33 bold',
-    Token.Operand: '#aa3333 bold',
+    Token.Command: '#5FFB17 bold',
+    Token.Operand: '#000000',
 })
