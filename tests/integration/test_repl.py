@@ -17,9 +17,14 @@ def _get_output(environment):
 
 
 @retrying.retry(stop_max_delay=10000, wait_fixed=1000)
-def _get_pipe_output(pipe_output_temp_file_path):
+def _get_pipe_output(pipe_output_temp_file_path, expect_empty_output=False):
     with io.open(pipe_output_temp_file_path, 'r') as f:
-        return f.readlines()
+        output = f.readlines()
+        if expect_empty_output:
+            assert len(output) == 0
+        else:
+            assert len(output) != 0
+        return output
 
 
 def test_command_alias(environment, couch_server):
@@ -399,6 +404,17 @@ def test_pipe_commands_multiple_pipes(environment, couch_server):
 
     output = _get_pipe_output(file_path)
     assert {'william', 'bill'} == set(map(str.strip, output))
+
+
+def test_pipe_commands_command_error(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    _, file_path = tempfile.mkstemp()
+    with io.open(file_path, 'w') as f:
+        environment.output_stream = f
+        eval_(environment, couch_server, 'ls | grep')
+
+    _get_pipe_output(file_path, expect_empty_output=True)
 
 
 def test_pipe_error(environment, couch_server):
