@@ -5,6 +5,8 @@ language: python
 env:
     - TOXENV=py35
     - TOXENV=py34
+    - TOXENV=py33
+    - TOXENV=py32
 install:
     - pip install tox
     - pip install -r requirements-docs.txt

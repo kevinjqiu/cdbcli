@@ -8,6 +8,7 @@ from unittest.mock import Mock
 from cdbcli.repl import eval_
 from cdbcli.commands import command_handler, COMMANDS
 from tests.integration.fixtures import *  # noqa
+from tests.utils import retry
 
 
 def _get_output(environment):
@@ -385,10 +386,11 @@ def test_pipe_commands_multiple_pipes(environment, couch_server):
         environment.output_stream = f
         eval_(environment, couch_server, 'ls | cut -d " " -f 2 | cut -d "." -f 1 | sort | uniq')
 
-    with io.open(file_path, 'r') as f:
-        output = f.readlines()
+    with retry(max_retries=10, delay_ms=250):
+        with io.open(file_path, 'r') as f:
+            output = f.readlines()
 
-    assert {'william', 'bill'} == set(map(str.strip, output))
+        assert {'william', 'bill'} == set(map(str.strip, output))
 
 
 def test_pipe_error(environment, couch_server):
