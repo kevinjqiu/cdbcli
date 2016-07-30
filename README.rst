@@ -2,12 +2,16 @@ cdbcli
 ======
 
 .. image:: https://img.shields.io/pypi/v/cdbcli.svg
-    :target: https://pypi.python.org/pypi/cdbcli
-    :alt: Latest PyPI version
+   :target: https://pypi.python.org/pypi/cdbcli
+   :alt: Latest PyPI version
 
 .. image:: https://travis-ci.org/kevinjqiu/cdbcli.svg?branch=master
-   :target: https://travis-ci.org/kevinjqiu/cdbcli.svg?branch=master
+   :target: https://travis-ci.org/kevinjqiu/cdbcli
    :alt: Latest Travis CI build status for master
+
+.. image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000
+   :target:
+   :alt: License
 
 The interactive shell for CouchDB
 
@@ -80,6 +84,19 @@ You will be greeted by the cdbcli's splash screen::
         Press Ctrl+C or Ctrl+D or type 'exit' to exit
 
     admin@yourdomain/>
+
+Run with Docker
+^^^^^^^^^^^^^^^
+
+``cdbcli`` is also available as a docker image on the `docker hub <https://hub.docker.com/r/kevinjqiu/cdbcli/>`_
+
+To run::
+
+	docker run -it kevinjqiu/cdbcli cdbcli <arguments>
+
+The docker networking restrictions apply, so if you want to connect to a database on localhost, e.g., you will need to let the container use the host's networking::
+
+    docker run -it --net=host kevinjqiu/cdbcli cdbcli <arguments>
 
 Installation
 ------------
