@@ -20,6 +20,7 @@ BANNER = """
     Welcome to cdbcli {cdbcli_version}
     CouchDB version: {couchdb_version}
 
+    Type 'help' or 'man' to get a list of all supported commands
     Press <TAB> for command auto-completion
     Press Ctrl+C or Ctrl+D or type 'exit' to exit
 """
