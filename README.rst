@@ -96,7 +96,7 @@ Run with Docker
 
 To run::
 
-	docker run -it kevinjqiu/cdbcli cdbcli <arguments>
+    docker run -it kevinjqiu/cdbcli cdbcli <arguments>
 
 The docker networking restrictions apply, so if you want to connect to a database on localhost, e.g., you will need to let the container use the host's networking::
 
