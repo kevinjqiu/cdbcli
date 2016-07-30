@@ -17,12 +17,12 @@ def _get_output(environment):
 
 
 @retrying.retry(stop_max_delay=10000, wait_fixed=1000)
-def _get_pipe_output(pipe_output_temp_file_path, expect_empty_output=False):
+def _get_pipe_output(pipe_output_temp_file_path, expect_empty_output=False):  # pragma: nocover
     with io.open(pipe_output_temp_file_path, 'r') as f:
         output = f.readlines()
         if expect_empty_output:
             assert len(output) == 0
-        else:  # pragma: nocover
+        else:
             assert len(output) != 0
         return output
 
