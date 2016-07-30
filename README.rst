@@ -16,7 +16,7 @@ Features
 - auto-completion for database name, document id, view name, command
 - syntax highlighting of documents and views
 - navigate a couchdb server as if it were a file system
-- various commands supported:
+- various commands supported
     - cd - change database
     - ls - list docs under a database
     - cat - show content of a doc
