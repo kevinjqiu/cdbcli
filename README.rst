@@ -9,7 +9,7 @@ cdbcli
    :target: https://travis-ci.org/kevinjqiu/cdbcli
    :alt: Latest Travis CI build status for master
 
-.. image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000
+.. image:: https://img.shields.io/badge/license-Apache%202.0-blue.svg
    :target: LICENSE
    :alt: License
 
