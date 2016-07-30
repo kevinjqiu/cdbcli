@@ -7,7 +7,7 @@ env:
     - TOXENV=py34
 install:
     - pip install tox
-    - pip install -r requirements-docs.txt
+    - pip install -r requirements-test.txt
 before_script:
     make start_couchdb 
 script:
