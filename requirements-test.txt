@@ -4,4 +4,3 @@ pytest-cov
 coveralls
 pytest-mock
 flake8
-retrying
