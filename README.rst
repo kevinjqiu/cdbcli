@@ -11,6 +11,24 @@ cdbcli
 
 The interactive shell for CouchDB
 
+Features
+--------
+- auto-completion for database name, document id, view name, command
+- syntax highlighting of documents and views
+- navigate a couchdb server as if it were a file system
+- various commands supported:
+    - cd - change database
+    - ls - list docs under a database
+    - cat - show content of a doc
+    - exec - execute a view
+    - rm - remove a doc
+    - man - show help on commands
+    - mkdir - create new database
+    - du - doc and database size
+    - lv - list views inside a view doc
+- create/update docs using external ``$EDITOR``
+- pipe output to external shell commands, such as ``grep``, ``wc`` and ``jq``
+
 Usage
 -----
 
