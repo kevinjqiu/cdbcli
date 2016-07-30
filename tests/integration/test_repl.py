@@ -375,8 +375,8 @@ def test_pipe_commands_one_pipe(environment, couch_server):
 
     with io.open(file_path, 'r') as f:
         output = f.readlines()
-    assert 'william.shakespear' in output[0]
-    assert 'william.shatner' in output[1]
+
+    assert {'d william.shakespear', 'd william.shatner'} == set(map(str.strip, output))
 
 
 def test_pipe_commands_multiple_pipes(environment, couch_server):
