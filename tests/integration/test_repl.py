@@ -2,6 +2,7 @@ import io
 import json
 import tempfile
 import pytest
+import retrying
 
 from unittest.mock import Mock
 
@@ -13,6 +14,12 @@ from tests.integration.fixtures import *  # noqa
 def _get_output(environment):
     environment.output_stream.seek(0)
     return environment.output_stream.read()
+
+
+@retrying.retry(stop_max_delay=10000, wait_fixed=1000)
+def _get_pipe_output(pipe_output_temp_file_path):
+    with io.open(pipe_output_temp_file_path, 'r') as f:
+        return f.readlines()
 
 
 def test_command_alias(environment, couch_server):
@@ -373,9 +380,7 @@ def test_pipe_commands_one_pipe(environment, couch_server):
         environment.output_stream = f
         eval_(environment, couch_server, 'ls | grep william')
 
-    with io.open(file_path, 'r') as f:
-        output = f.readlines()
-
+    output = _get_pipe_output(file_path)
     assert {'d william.shakespear', 'd william.shatner'} == set(map(str.strip, output))
 
 
@@ -392,9 +397,7 @@ def test_pipe_commands_multiple_pipes(environment, couch_server):
         environment.output_stream = f
         eval_(environment, couch_server, 'ls | cut -d " " -f 2 | cut -d "." -f 1 | sort | uniq')
 
-    with io.open(file_path, 'r') as f:
-        output = f.readlines()
-
+    output = _get_pipe_output(file_path)
     assert {'william', 'bill'} == set(map(str.strip, output))
 
 
