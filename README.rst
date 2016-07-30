@@ -5,9 +5,9 @@ cdbcli
     :target: https://pypi.python.org/pypi/cdbcli
     :alt: Latest PyPI version
 
-.. image:: https://travis-ci.org/kevinjqiu/cdbcli.png
-   :target: https://travis-ci.org/kevinjqiu/cdbcli
-   :alt: Latest Travis CI build status
+.. image:: https://travis-ci.org/kevinjqiu/cdbcli.svg?branch=master
+   :target: https://travis-ci.org/kevinjqiu/cdbcli.svg?branch=master
+   :alt: Latest Travis CI build status for master
 
 The interactive shell for CouchDB
 
