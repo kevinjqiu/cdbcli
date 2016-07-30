@@ -276,6 +276,13 @@ def test_man_command_has_help(environment, couch_server):
     assert 'Blah blah' == output.strip()
 
 
+def test_man_command_shows_all_help(environment, couch_server):
+    eval_(environment, couch_server, 'man')
+    output = _get_output(environment)
+    for command, handler in COMMANDS.items():
+        assert handler.help in output
+
+
 def test_edit_requires_current_db(environment, couch_server):
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'vim blah')
