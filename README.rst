@@ -21,7 +21,7 @@ cdbcli - CouchDB Interactive Shell
    :target: LICENSE
    :alt: License
 
-.. image:: https://img.shields.io/badge/dockerhub-kevinjqiu%2Fcdbcli-orange.svg
+.. image:: https://img.shields.io/badge/docker-kevinjqiu%2Fcdbcli-blue.svg
    :target: https://hub.docker.com/r/kevinjqiu/cdbcli/
    :alt: Image on Docker Hub
 
