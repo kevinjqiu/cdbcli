@@ -27,6 +27,13 @@ def _get_pipe_output(pipe_output_temp_file_path, expect_empty_output=False):  # 
         return output
 
 
+def test_non_admin_cannot_access_users(environment, non_admin_couch_server):
+    eval_(environment, non_admin_couch_server, 'cd _users')
+    with pytest.raises(RuntimeError) as e:
+        eval_(environment, non_admin_couch_server, 'ls')
+    assert 'Permission denied' == str(e.value)
+
+
 def test_command_alias(environment, couch_server):
     @command_handler('abc', aliases=['duh', 'huh'])
     def abc(environment, couch_server):
