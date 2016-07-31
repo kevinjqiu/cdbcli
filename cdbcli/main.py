@@ -58,7 +58,7 @@ class Config():
 def main(host, port, username, password, askpass, tls, version, database):
     if version:
         print(get_version())
-        sys.exit(0)
+        return 0
 
     if askpass:
         password = prompt('Enter password: ', is_password=True)
@@ -66,7 +66,7 @@ def main(host, port, username, password, askpass, tls, version, database):
     config = Config(host, port, username, password, tls, database)
     couch_server = couchdb.Server(config.url)
     r = repl.Repl(couch_server, config)
-    r.run()
+    return r.run()
 
 
 def get_version():
