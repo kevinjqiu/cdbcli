@@ -21,6 +21,11 @@ def test_cred_str_default_username_to_admin_when_only_pwd_given():
     assert cfg.url == 'http://admin:pwd@localhost:5984'
 
 
+def test_cred_str_default_username_to_nobody_when_no_pwd_given():
+    cfg = Config('localhost', 5984, None, None, False, '')
+    assert cfg.url == 'http://localhost:5984'
+
+
 def test_no_tls_means_http():
     cfg = Config('localhost', 5984, 'admin', 'pwd', False, '')
     assert cfg.url == 'http://admin:pwd@localhost:5984'
