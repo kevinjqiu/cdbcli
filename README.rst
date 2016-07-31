@@ -1,15 +1,48 @@
-cdbcli
-======
+cdbcli - CouchDB Interactive Shell
+==================================
 
 .. image:: https://img.shields.io/pypi/v/cdbcli.svg
-    :target: https://pypi.python.org/pypi/cdbcli
-    :alt: Latest PyPI version
+   :target: https://pypi.python.org/pypi/cdbcli
+   :alt: Latest PyPI version
 
-.. image:: https://travis-ci.org/kevinjqiu/cdbcli.png
+.. image:: https://travis-ci.org/kevinjqiu/cdbcli.svg?branch=master
    :target: https://travis-ci.org/kevinjqiu/cdbcli
-   :alt: Latest Travis CI build status
+   :alt: Latest Travis CI build status for master
 
-The interactive CLI for CouchDB
+.. image:: https://readthedocs.org/projects/cdbcli/badge/?version=latest
+   :target: https://cdbcli.readthedocs.io/en/latest/
+   :alt: Documentation Status
+
+.. image:: https://coveralls.io/repos/github/kevinjqiu/cdbcli/badge.svg
+   :target: https://coveralls.io/github/kevinjqiu/cdbcli
+   :alt: Code Coverage
+
+.. image:: https://img.shields.io/badge/license-Apache%202.0-blue.svg
+   :target: LICENSE
+   :alt: License
+
+.. image:: https://img.shields.io/badge/docker-kevinjqiu%2Fcdbcli-blue.svg
+   :target: https://hub.docker.com/r/kevinjqiu/cdbcli/
+   :alt: Image on Docker Hub
+
+Features
+--------
+
+- auto-completion for database name, document id, view name, command
+- syntax highlighting of documents and views
+- navigate a couchdb server as if it were a file system
+- various commands supported
+    * cd - change database
+    * ls - list docs under a database
+    * cat - show content of a doc
+    * exec - execute a view
+    * rm - remove a doc
+    * man - show help on commands
+    * mkdir - create new database
+    * du - doc and database size
+    * lv - list views inside a view doc
+- create/update docs using external ``$EDITOR``
+- pipe output to external shell commands, such as ``grep``, ``wc`` and ``jq``
 
 Usage
 -----
@@ -54,27 +87,27 @@ You will be greeted by the cdbcli's splash screen::
         ( (__  )(_) )) _ <( (__  )(__  _)(_
          \___)(____/(____/ \___)(____)(____)
 
-        Welcome to cdbcli
+        Welcome to cdbcli 0.1.1
         CouchDB version: 1.5.0
 
+        Type 'help' or 'man' to get a list of all supported commands
         Press <TAB> for command auto-completion
         Press Ctrl+C or Ctrl+D or type 'exit' to exit
 
     admin@yourdomain/>
 
+Run with Docker
+^^^^^^^^^^^^^^^
 
-``cd <database>``
-^^^^^^^^^^^^^^^^^
+``cdbcli`` is also available as a docker image on the `docker hub <https://hub.docker.com/r/kevinjqiu/cdbcli/>`_
 
-Change database is achieved by using the ``cd`` command::
+To run::
 
-    admin@yourdomain/> cd test
-    admin@yourdomain/test>
+    docker run -it kevinjqiu/cdbcli cdbcli <arguments>
 
-Use ``cd ..`` or ``cd /`` to go back to the root of the database::
+The docker networking restrictions apply, so if you want to connect to a database on localhost, e.g., you will need to let the container use the host's networking::
 
-    admin@yourdomain/test> cd /
-    admin@yourdomain/>
+    docker run -it --net=host kevinjqiu/cdbcli cdbcli <arguments>
 
 Installation
 ------------
@@ -105,7 +138,7 @@ Contributing to Documentation
 Licence
 -------
 
-cdbcli is licensed under Apache 2.0
+``cdbcli`` is licensed under Apache 2.0
 
 
 Authors

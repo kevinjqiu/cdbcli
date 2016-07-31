@@ -1,3 +1,4 @@
+import couchdb.http
 import contextlib
 import io
 import subprocess
@@ -45,17 +46,14 @@ class Environment():
             else:
                 stdin = subprocs[i - 1].stdout
 
-            try:
-                process = subprocess.Popen(shell_command, stdin=stdin, stdout=stdout, stderr=sys.stderr)
-            except OSError as e:
-                raise RuntimeError(str(e))
-            else:
-                subprocs.append(process)
+            process = subprocess.Popen(shell_command, stdin=stdin, stdout=stdout, stderr=sys.stderr)
+            subprocs.append(process)
 
         return subprocs
 
     @contextlib.contextmanager
     def pipe(self, shell_commands):
+        # TODO: this probably belong to a different class, not Environment
         prev_output_stream = self.output_stream
 
         try:
@@ -67,6 +65,13 @@ class Environment():
             yield self
             if subprocs:
                 subprocs[0].communicate()
+        except (IOError, OSError) as e:
+            raise RuntimeError(str(e))
+        except couchdb.http.ServerError as e:
+            _, (type, message) = e.args[0]
+            if type == 'forbidden':
+                raise RuntimeError('Permission denied')
+            raise RuntimeError(message)
         finally:
             self.output_stream = prev_output_stream
             self.has_pipe = False

@@ -2,6 +2,7 @@ import io
 import json
 import tempfile
 import pytest
+import retrying
 
 from unittest.mock import Mock
 
@@ -13,6 +14,24 @@ from tests.integration.fixtures import *  # noqa
 def _get_output(environment):
     environment.output_stream.seek(0)
     return environment.output_stream.read()
+
+
+@retrying.retry(stop_max_delay=10000, wait_fixed=1000)
+def _get_pipe_output(pipe_output_temp_file_path, expect_empty_output=False):  # pragma: nocover
+    with io.open(pipe_output_temp_file_path, 'r') as f:
+        output = f.readlines()
+        if expect_empty_output:
+            assert len(output) == 0
+        else:
+            assert len(output) != 0
+        return output
+
+
+def test_non_admin_cannot_access_users(environment, non_admin_couch_server):
+    eval_(environment, non_admin_couch_server, 'cd _users')
+    with pytest.raises(RuntimeError) as e:
+        eval_(environment, non_admin_couch_server, 'ls')
+    assert 'Permission denied' == str(e.value)
 
 
 def test_command_alias(environment, couch_server):
@@ -276,6 +295,13 @@ def test_man_command_has_help(environment, couch_server):
     assert 'Blah blah' == output.strip()
 
 
+def test_man_command_shows_all_help(environment, couch_server):
+    eval_(environment, couch_server, 'man')
+    output = _get_output(environment)
+    for command, handler in COMMANDS.items():
+        assert handler.help in output
+
+
 def test_edit_requires_current_db(environment, couch_server):
     with pytest.raises(RuntimeError):
         eval_(environment, couch_server, 'vim blah')
@@ -366,10 +392,8 @@ def test_pipe_commands_one_pipe(environment, couch_server):
         environment.output_stream = f
         eval_(environment, couch_server, 'ls | grep william')
 
-    with io.open(file_path, 'r') as f:
-        output = f.readlines()
-    assert 'william.shakespear' in output[0]
-    assert 'william.shatner' in output[1]
+    output = _get_pipe_output(file_path)
+    assert {'d william.shakespear', 'd william.shatner'} == set(map(str.strip, output))
 
 
 def test_pipe_commands_multiple_pipes(environment, couch_server):
@@ -385,9 +409,7 @@ def test_pipe_commands_multiple_pipes(environment, couch_server):
         environment.output_stream = f
         eval_(environment, couch_server, 'ls | cut -d " " -f 2 | cut -d "." -f 1 | sort | uniq')
 
-    with io.open(file_path, 'r') as f:
-        output = f.readlines()
-
+    output = _get_pipe_output(file_path)
     assert {'william', 'bill'} == set(map(str.strip, output))
 
 

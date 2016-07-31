@@ -49,7 +49,7 @@ class Config():
 @click.command()
 @click.option('-h', '--host', default='localhost', help='The host of the couchdb instance')
 @click.option('--port', default='5984', help='The port of the couchdb instance')
-@click.option('-u', '--username', default='admin', help='The username to connect as')
+@click.option('-u', '--username', default=None, help='The username to connect as')
 @click.option('-p', '--password', default=None, help='The password')
 @click.option('-P', '--askpass/--no-askpass', default=False, help='Ask for password?')
 @click.option('--tls/--no-tls', default=False, help='Use TLS to connect to the couchdb instance?')
@@ -58,7 +58,7 @@ class Config():
 def main(host, port, username, password, askpass, tls, version, database):
     if version:
         print(get_version())
-        sys.exit(0)
+        return 0
 
     if askpass:
         password = prompt('Enter password: ', is_password=True)
@@ -66,7 +66,7 @@ def main(host, port, username, password, askpass, tls, version, database):
     config = Config(host, port, username, password, tls, database)
     couch_server = couchdb.Server(config.url)
     r = repl.Repl(couch_server, config)
-    r.run()
+    return r.run()
 
 
 def get_version():

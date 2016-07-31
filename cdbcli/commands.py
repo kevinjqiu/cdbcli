@@ -219,24 +219,29 @@ def lv(environment, couch_server, variables):
         environment.output(highlighter(reduce_func))
 
 
-@command_handler('man', pattern='(?P<target>[a-zA-Z0-9-_]+)')
+@command_handler('man', pattern='(?P<target>[a-zA-Z0-9-_]*)', aliases=['help'])
 def man(environment, couch_server, variables):
     """man <command>
 
     Show help for the command.
     """
     command = variables.get('target')
-    command_handler = COMMANDS.get(command)
-    if not command_handler:
-        raise RuntimeError('Command {} not recognized'.format(command))
 
-    if not command_handler.help:
-        environment.output('No manual entry for {}'.format(command))
-        return
+    if not command:
+        commands = COMMANDS.keys()
+    else:
+        commands = [command]
 
-    environment.output('')
-    environment.output(command_handler.help)
-    environment.output('')
+    for command in commands:
+        command_handler = COMMANDS.get(command)
+        if not command_handler:
+            raise RuntimeError('Command {} not recognized'.format(command))
+
+        if not command_handler.help:
+            environment.output('No manual entry for {}'.format(command))
+            return
+
+        environment.output(command_handler.help)
 
 
 @command_handler('exit')

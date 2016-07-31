@@ -1,8 +1,10 @@
 import setuptools
+import cdbcli
+
 
 setuptools.setup(
     name="cdbcli",
-    version="0.1.1",
+    version=cdbcli.__version__,
     url="https://github.com/kevinjqiu/cdbcli",
 
     author="Kevin J. Qiu",
@@ -20,10 +22,11 @@ setuptools.setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.4',
     ],
     entry_points={
         'console_scripts': [
-            'cdbcli=cdbcli:main'
+            'cdbcli=cdbcli.main:main'
         ]
     },
 )
