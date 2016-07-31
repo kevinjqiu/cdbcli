@@ -147,3 +147,9 @@ Authors
 `cdbcli` was written by `Kevin J. Qiu <kevin@idempotent.ca>`_.
 
 See `all contributors <https://github.com/kevinjqiu/cdbcli/graphs/contributors>`_
+
+Attribution
+-----------
+
+* `python-prompt-toolkit <https://github.com/jonathanslenders/python-prompt-toolkit>`_ by Jonathan Slenders
+* `click <http://click.pocoo.org/5/>`_ by Armin Ronacher
