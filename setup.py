@@ -15,7 +15,9 @@ setuptools.setup(
 
     packages=setuptools.find_packages(),
 
-    install_requires=[],
+    install_requires=[
+        req.strip() for req in open('requirements.txt').readlines() if req
+    ],
 
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
