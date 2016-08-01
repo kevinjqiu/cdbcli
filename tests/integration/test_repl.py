@@ -1,3 +1,4 @@
+import functools
 import io
 import json
 import tempfile
@@ -27,6 +28,17 @@ def _get_pipe_output(pipe_output_temp_file_path, expect_empty_output=False):  # 
         return output
 
 
+def _assert_command_requires_current_db(command, environment, couch_server):
+    with pytest.raises(RuntimeError) as e:
+        eval_(environment, couch_server, command)
+    assert str(e.value) == 'No database selected.'
+
+
+for command in ['exec blah', 'lv blah', 'vim blah', 'touch blah', 'info', 'cat blah']:
+    test_name = 'test_requires_current_db_for_command_{}'.format(command.replace(' ', '_'))
+    globals()[test_name] = functools.partial(_assert_command_requires_current_db, command)
+
+
 def test_non_admin_cannot_access_users(environment, non_admin_couch_server):
     eval_(environment, non_admin_couch_server, 'cd _users')
     with pytest.raises(RuntimeError) as e:
@@ -45,11 +57,6 @@ def test_command_alias(environment, couch_server):
     assert 'duh' in COMMANDS
     assert 'huh' in COMMANDS
     assert handler is COMMANDS['duh'] is COMMANDS['huh']
-
-
-def test_info_command_raises_error_when_no_current_db(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'info')
 
 
 def test_info_command_show_db_stats(environment, couch_server):
@@ -159,11 +166,6 @@ def test_cat_raises_error_when_no_docid_specified(environment, couch_server):
         eval_(environment, couch_server, 'cat')
 
 
-def test_cat_raises_error_when_no_current_db_selected(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'cat cafebabe')
-
-
 def test_cat_raises_error_when_no_doc_matching_id(environment, couch_server):
     db = couch_server.create('test')
     doc_id, _ = db.save({})
@@ -210,11 +212,6 @@ def test_mkdir_raises_exception_for_non_admin(environment, non_admin_couch_serve
         eval_(environment, non_admin_couch_server, 'mkdir blah')
 
 
-def test_exec_requires_current_db(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'exec blah')
-
-
 def test_exec_view_does_not_exist(environment, couch_server):
     db = couch_server.create('test')
     db.save(get_user_design_doc())
@@ -239,11 +236,6 @@ def test_exec_view(environment, couch_server, mocker):
     expected = set(['washington', 'jefferson', 'adams'])
     actual = set([x['key'] for x in highlighted])
     assert expected == actual
-
-
-def test_lv_requires_current_db(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'lv blah')
 
 
 def test_lv_requires_real_view_doc_id(environment, couch_server):
@@ -300,11 +292,6 @@ def test_man_command_shows_all_help(environment, couch_server):
     output = _get_output(environment)
     for command, handler in COMMANDS.items():
         assert handler.help in output
-
-
-def test_edit_requires_current_db(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'vim blah')
 
 
 def _setup_edit_environment(environment, couch_server, mocker, file_content):
@@ -424,11 +411,6 @@ def test_pipe_error(environment, couch_server):
         # environment.output_stream should be reverted to its original state
         # if anything in the pipe fails
         assert environment.output_stream is f
-
-
-def test_touch_requires_current_db(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'touch blah')
 
 
 def test_touch_requires_doc_id(environment, couch_server):
