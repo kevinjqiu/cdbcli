@@ -429,10 +429,10 @@ def test_pipe_error(environment, couch_server):
 def test_repl_prompt_non_admin(environment, non_admin_couch_server):
     config = Mock(username='None', host='localhost', database=None)
     repl = Repl(non_admin_couch_server, config, environment)
-    assert 'None@localhost$' == repl.prompt
+    assert 'None@localhost/$ ' == repl.prompt
 
 
 def test_repl_prompt_admin(environment, couch_server):
     config = Mock(username='admin', host='localhost', database=None)
     repl = Repl(non_admin_couch_server, config, environment)
-    assert 'admin@localhost#' == repl.prompt
+    assert 'admin@localhost/# ' == repl.prompt
