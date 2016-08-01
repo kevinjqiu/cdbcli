@@ -304,3 +304,20 @@ def edit(environment, couch_server, variables):
             environment.current_db[doc_id] = updated_doc
     except Exception as e:
         raise RuntimeError(str(e))
+
+
+@command_handler('touch', pattern='(?P<doc_id>[^\s]+)')
+@require_current_db
+def touch(environment, couch_server, variables):
+    """touch <doc_id>
+
+
+    Create an empty document by doc_id.
+    """
+    doc_id = variables.get('doc_id')
+
+    if not doc_id:
+        raise RuntimeError('Must specify doc_id')
+
+    doc = {'_id': doc_id}
+    environment.current_db.save(doc)

@@ -426,6 +426,27 @@ def test_pipe_error(environment, couch_server):
         assert environment.output_stream is f
 
 
+def test_touch_requires_current_db(environment, couch_server):
+    with pytest.raises(RuntimeError):
+        eval_(environment, couch_server, 'touch blah')
+
+
+def test_touch_requires_doc_id(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    with pytest.raises(RuntimeError) as e:
+        eval_(environment, couch_server, 'touch ')
+    assert str(e.value) == 'Must specify doc_id'
+
+
+def test_touch_creates_empty_doc(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    eval_(environment, couch_server, 'touch finding_nemo')
+    assert db['finding_nemo'] is not None
+    assert {'_id', '_rev'} == set(db['finding_nemo'].keys())
+
+
 def test_repl_prompt_non_admin(environment, non_admin_couch_server):
     config = Mock(username='None', host='localhost', database=None)
     repl = Repl(non_admin_couch_server, config, environment)
