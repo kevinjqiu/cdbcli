@@ -34,7 +34,7 @@ def _assert_command_requires_current_db(command, environment, couch_server):
     assert str(e.value) == 'No database selected.'
 
 
-for command in ['exec blah', 'lv blah', 'vim blah', 'touch blah', 'info', 'cat blah']:
+for command in ['exec blah', 'lv blah', 'vim blah', 'touch blah', 'info', 'cat blah', 'rm blah']:
     test_name = 'test_requires_current_db_for_command_{}'.format(command.replace(' ', '_'))
     globals()[test_name] = functools.partial(_assert_command_requires_current_db, command)
 
