@@ -6,7 +6,7 @@ import retrying
 
 from unittest.mock import Mock
 
-from cdbcli.repl import eval_
+from cdbcli.repl import eval_, Repl
 from cdbcli.commands import command_handler, COMMANDS
 from tests.integration.fixtures import *  # noqa
 
@@ -424,3 +424,15 @@ def test_pipe_error(environment, couch_server):
         # environment.output_stream should be reverted to its original state
         # if anything in the pipe fails
         assert environment.output_stream is f
+
+
+def test_repl_prompt_non_admin(environment, non_admin_couch_server):
+    config = Mock(username='None', host='localhost', database=None)
+    repl = Repl(non_admin_couch_server, config, environment)
+    assert 'None@localhost$' == repl.prompt
+
+
+def test_repl_prompt_admin(environment, couch_server):
+    config = Mock(username='admin', host='localhost', database=None)
+    repl = Repl(non_admin_couch_server, config, environment)
+    assert 'admin@localhost#' == repl.prompt

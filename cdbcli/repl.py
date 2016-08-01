@@ -47,10 +47,10 @@ def eval_(environment, couch_server, command_text):
 
 
 class Repl():
-    def __init__(self, couch_server, config):
+    def __init__(self, couch_server, config, environment=None):
         self._couch_server = couch_server
         self._config = config
-        self._environment = Environment()
+        self._environment = environment or Environment()
 
         try:
             if self._config.database:
