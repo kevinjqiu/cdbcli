@@ -25,6 +25,10 @@ cdbcli - CouchDB Interactive Shell
    :target: https://hub.docker.com/r/kevinjqiu/cdbcli/
    :alt: Image on Docker Hub
 
+.. image:: https://img.shields.io/badge/aur-cdbcli-blue.svg
+   :target: https://aur.archlinux.org/packages/cdbcli/
+   :alt: Arch User Repository
+
 Features
 --------
 
