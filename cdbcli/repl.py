@@ -66,10 +66,10 @@ class Repl():
             database = ''
 
         privilege_indicator = '#' if self._config.username == 'admin' else '$'
-        return '{username}@{host}/{database}{privilege_indicator} '.format(username=self._config.username,
-                                                                           host=self._config.host,
-                                                                           privilege_indicator=privilege_indicator,
-                                                                           database=database)
+        return u'{username}@{host}/{database}{privilege_indicator} '.format(username=self._config.username,
+                                                                            host=self._config.host,
+                                                                            privilege_indicator=privilege_indicator,
+                                                                            database=database)
 
     def _hello(self):
         message = BANNER.format(cdbcli_version=cdbcli_version,

@@ -61,7 +61,7 @@ def main(host, port, username, password, askpass, tls, version, database):
         return 0
 
     if askpass:
-        password = prompt('Enter password: ', is_password=True)
+        password = prompt(u'Enter password: ', is_password=True)
 
     config = Config(host, port, username, password, tls, database)
     couch_server = couchdb.Server(config.url)
