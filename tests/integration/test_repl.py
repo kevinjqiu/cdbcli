@@ -5,7 +5,7 @@ import tempfile
 import pytest
 import retrying
 
-from unittest.mock import Mock
+from mock import Mock
 
 from cdbcli.repl import eval_, Repl
 from cdbcli.commands import command_handler, COMMANDS
