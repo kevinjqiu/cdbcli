@@ -34,12 +34,12 @@ def eval_(environment, couch_server, command_text):
 
     m = grammar.match_prefix(cli_command)
     if not m:
-        raise RuntimeError('Invalid input')
+        raise RuntimeError(u'Invalid input')
 
     command = m.variables().get('command')
 
     if command not in COMMANDS:
-        raise RuntimeError('{}: command not found'.format(cli_command))
+        raise RuntimeError(u'{}: command not found'.format(cli_command))
 
     handler, _, _ = COMMANDS[command]
     with environment.pipe(shell_commands) as environment:
@@ -56,7 +56,7 @@ class Repl():
             if self._config.database:
                 self._environment.current_db = self._couch_server[self._config.database]
         except couchdb.ResourceNotFound:
-            self._environment.output("Database '{}' not found".format(self._config.database))
+            self._environment.output(u"Database '{}' not found".format(self._config.database))
 
     @property
     def prompt(self):
@@ -96,13 +96,13 @@ class Repl():
             except RuntimeError as e:
                 self._environment.output(str(e))
             except (EOFError, KeyboardInterrupt):
-                self._environment.output('Exiting...')
+                self._environment.output(u'Exiting...')
                 break
 
     def run(self):
         try:
             self._hello()
         except couchdb.Unauthorized as e:
-            self._environment.output('Error connecting to the couchdb instance: {!s}'.format(e))
+            self._environment.output(u'Error connecting to the couchdb instance: {!s}'.format(e))
         else:
             self._run()
