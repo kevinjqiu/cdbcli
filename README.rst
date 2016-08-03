@@ -51,10 +51,8 @@ Features
 Demo
 ----
 
-.. raw:: html
-
-    <script type="text/javascript" src="https://asciinema.org/a/1mj2j4cxhqmq5m6t16tm82ws8.js" id="asciicast-1mj2j4cxhqmq5m6t16tm82ws8" async></script>
-
+.. image:: https://asciinema.org/a/1mj2j4cxhqmq5m6t16tm82ws8.png
+   :target: https://asciinema.org/a/1mj2j4cxhqmq5m6t16tm82ws8
 
 Usage
 -----
