@@ -52,6 +52,7 @@ Demo
 ----
 
 .. image:: https://asciinema.org/a/1mj2j4cxhqmq5m6t16tm82ws8.png
+   :width: 200px
    :target: https://asciinema.org/a/1mj2j4cxhqmq5m6t16tm82ws8
 
 Usage
