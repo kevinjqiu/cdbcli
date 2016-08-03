@@ -48,6 +48,13 @@ Features
 - create/update docs using external ``$EDITOR``
 - pipe output to external shell commands, such as ``grep``, ``wc`` and ``jq``
 
+Demo
+----
+
+.. image:: https://asciinema.org/a/1mj2j4cxhqmq5m6t16tm82ws8.png
+   :scale: 50%
+   :target: https://asciinema.org/a/1mj2j4cxhqmq5m6t16tm82ws8
+
 Usage
 -----
 
