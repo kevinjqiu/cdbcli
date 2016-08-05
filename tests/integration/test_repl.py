@@ -413,6 +413,24 @@ def test_pipe_error(environment, couch_server):
         assert environment.output_stream is f
 
 
+def test_du_command_no_database_selected(environment, couch_server):
+    couch_server.create('test')
+    eval_(environment, couch_server, 'du')
+    output = _get_output(environment).splitlines()
+    assert '_replicator' in output[0]
+    assert '_users' in output[1]
+    assert 'test' in output[2]
+
+
+def test_du_command_with_database_selected(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    _, file_path = tempfile.mkstemp()
+    eval_(environment, couch_server, 'du')
+    output = _get_output(environment)
+    assert 'test' in output
+
+
 def test_touch_requires_doc_id(environment, couch_server):
     db = couch_server.create('test')
     environment.current_db = db

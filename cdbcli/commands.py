@@ -253,6 +253,40 @@ def exit(environment, couch_server, variables):
     raise EOFError()
 
 
+def _convert_bytes_to_human_readable(size_in_bytes):
+    units = ['byte', 'KB', 'MB', 'GB', 'TB']
+    unit_step = 0
+    memory_amount = float(size_in_bytes)
+    while memory_amount > 1024 and unit_step < len(units):
+        memory_amount /= 1024.0
+        unit_step += 1
+
+    return '{:.2f} {}s'.format(memory_amount, units[unit_step])
+
+
+@command_handler('du')
+def du(environment, couch_server, variables):
+    """du
+
+    Shows the number of documents and amount of disk space they take up.
+    """
+    databases = [environment.current_db]
+
+    if not environment.current_db:
+        db_names = couch_server.resource.get_json('_all_dbs')[2]
+        databases = [couch_server[db] for db in db_names]
+
+    for database in databases:
+        db_info = database.info()
+
+        # Refer to http://docs.couchdb.org/en/latest/api/database/common.html#get--db
+        docs_in_db = db_info['doc_count']
+        total_usage = _convert_bytes_to_human_readable(db_info['disk_size'])
+        environment.output('{:<16}{:<24}({} documents)'.format(total_usage, database.name, docs_in_db))
+
+    environment.output('')
+
+
 def _save_doc_to_file(file_path, doc):
     with io.open(file_path, 'w', encoding='utf8') as fh:
         json.dump(doc, fh, sort_keys=True, indent=4)
