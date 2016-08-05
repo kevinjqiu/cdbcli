@@ -25,6 +25,10 @@ cdbcli - CouchDB Interactive Shell
    :target: https://hub.docker.com/r/kevinjqiu/cdbcli/
    :alt: Image on Docker Hub
 
+.. image:: https://img.shields.io/badge/aur-cdbcli-blue.svg
+   :target: https://aur.archlinux.org/packages/cdbcli/
+   :alt: Arch User Repository
+
 Features
 --------
 
@@ -43,6 +47,13 @@ Features
     * lv - list views inside a view doc
 - create/update docs using external ``$EDITOR``
 - pipe output to external shell commands, such as ``grep``, ``wc`` and ``jq``
+
+Demo
+----
+
+.. image:: https://asciinema.org/a/1mj2j4cxhqmq5m6t16tm82ws8.png
+   :scale: 50%
+   :target: https://asciinema.org/a/1mj2j4cxhqmq5m6t16tm82ws8
 
 Usage
 -----
@@ -147,3 +158,9 @@ Authors
 `cdbcli` was written by `Kevin J. Qiu <kevin@idempotent.ca>`_.
 
 See `all contributors <https://github.com/kevinjqiu/cdbcli/graphs/contributors>`_
+
+Attribution
+-----------
+
+* `python-prompt-toolkit <https://github.com/jonathanslenders/python-prompt-toolkit>`_ by Jonathan Slenders
+* `click <http://click.pocoo.org/5/>`_ by Armin Ronacher

@@ -1,3 +1,4 @@
+import functools
 import io
 import json
 import tempfile
@@ -6,7 +7,7 @@ import retrying
 
 from unittest.mock import Mock
 
-from cdbcli.repl import eval_
+from cdbcli.repl import eval_, Repl
 from cdbcli.commands import command_handler, COMMANDS
 from tests.integration.fixtures import *  # noqa
 
@@ -27,6 +28,17 @@ def _get_pipe_output(pipe_output_temp_file_path, expect_empty_output=False):  # 
         return output
 
 
+def _assert_command_requires_current_db(command, environment, couch_server):
+    with pytest.raises(RuntimeError) as e:
+        eval_(environment, couch_server, command)
+    assert str(e.value) == 'No database selected.'
+
+
+for command in ['exec blah', 'lv blah', 'vim blah', 'touch blah', 'info', 'cat blah', 'rm blah']:
+    test_name = 'test_requires_current_db_for_command_{}'.format(command.replace(' ', '_'))
+    globals()[test_name] = functools.partial(_assert_command_requires_current_db, command)
+
+
 def test_non_admin_cannot_access_users(environment, non_admin_couch_server):
     eval_(environment, non_admin_couch_server, 'cd _users')
     with pytest.raises(RuntimeError) as e:
@@ -45,11 +57,6 @@ def test_command_alias(environment, couch_server):
     assert 'duh' in COMMANDS
     assert 'huh' in COMMANDS
     assert handler is COMMANDS['duh'] is COMMANDS['huh']
-
-
-def test_info_command_raises_error_when_no_current_db(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'info')
 
 
 def test_info_command_show_db_stats(environment, couch_server):
@@ -159,11 +166,6 @@ def test_cat_raises_error_when_no_docid_specified(environment, couch_server):
         eval_(environment, couch_server, 'cat')
 
 
-def test_cat_raises_error_when_no_current_db_selected(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'cat cafebabe')
-
-
 def test_cat_raises_error_when_no_doc_matching_id(environment, couch_server):
     db = couch_server.create('test')
     doc_id, _ = db.save({})
@@ -210,11 +212,6 @@ def test_mkdir_raises_exception_for_non_admin(environment, non_admin_couch_serve
         eval_(environment, non_admin_couch_server, 'mkdir blah')
 
 
-def test_exec_requires_current_db(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'exec blah')
-
-
 def test_exec_view_does_not_exist(environment, couch_server):
     db = couch_server.create('test')
     db.save(get_user_design_doc())
@@ -239,11 +236,6 @@ def test_exec_view(environment, couch_server, mocker):
     expected = set(['washington', 'jefferson', 'adams'])
     actual = set([x['key'] for x in highlighted])
     assert expected == actual
-
-
-def test_lv_requires_current_db(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'lv blah')
 
 
 def test_lv_requires_real_view_doc_id(environment, couch_server):
@@ -300,11 +292,6 @@ def test_man_command_shows_all_help(environment, couch_server):
     output = _get_output(environment)
     for command, handler in COMMANDS.items():
         assert handler.help in output
-
-
-def test_edit_requires_current_db(environment, couch_server):
-    with pytest.raises(RuntimeError):
-        eval_(environment, couch_server, 'vim blah')
 
 
 def _setup_edit_environment(environment, couch_server, mocker, file_content):
@@ -428,31 +415,45 @@ def test_pipe_error(environment, couch_server):
 
 def test_du_command_no_database_selected(environment, couch_server):
     couch_server.create('test')
-    _, file_path = tempfile.mkstemp()
-    with io.open(file_path, 'w') as f:
-        environment.output_stream = f
-        eval_(environment, couch_server, 'du')
-
-    with io.open(file_path, 'r') as f:
-        output = f.readlines()
+    eval_(environment, couch_server, 'du')
+    output = _get_output(environment).splitlines()
     assert '_replicator' in output[0]
     assert '_users' in output[1]
     assert 'test' in output[2]
-
-    # TODO: Test output
-    # _replicator:     1 documents in 1.96 KBs of memory, 4.10 KBs in total
-    # _users:          1 documents in 1.97 KBs of memory, 4.10 KBs in total
-    # database:        0 documents in 0.00 bytes of memory, 79.00 bytes in total
 
 
 def test_du_command_with_database_selected(environment, couch_server):
     db = couch_server.create('test')
     environment.current_db = db
     _, file_path = tempfile.mkstemp()
-    with io.open(file_path, 'w') as f:
-        environment.output_stream = f
-        eval_(environment, couch_server, 'du')
+    eval_(environment, couch_server, 'du')
+    output = _get_output(environment)
+    assert 'test' in output
 
-    with io.open(file_path, 'r') as f:
-        output = f.readlines()
-    assert 'test' in output[0]
+
+def test_touch_requires_doc_id(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    with pytest.raises(RuntimeError) as e:
+        eval_(environment, couch_server, 'touch ')
+    assert str(e.value) == 'Must specify doc_id'
+
+
+def test_touch_creates_empty_doc(environment, couch_server):
+    db = couch_server.create('test')
+    environment.current_db = db
+    eval_(environment, couch_server, 'touch finding_nemo')
+    assert db['finding_nemo'] is not None
+    assert {'_id', '_rev'} == set(db['finding_nemo'].keys())
+
+
+def test_repl_prompt_non_admin(environment, non_admin_couch_server):
+    config = Mock(username='None', host='localhost', database=None)
+    repl = Repl(non_admin_couch_server, config, environment)
+    assert 'None@localhost/ $ ' == repl.prompt
+
+
+def test_repl_prompt_admin(environment, couch_server):
+    config = Mock(username='admin', host='localhost', database=None)
+    repl = Repl(non_admin_couch_server, config, environment)
+    assert 'admin@localhost/ # ' == repl.prompt
