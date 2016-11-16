@@ -203,8 +203,8 @@ def lv(environment, couch_server, variables):
     highlighter = {
         'python': highlighters.python,
         'javascript': highlighters.javascript,
-        None: lambda x: x
-    }.get(language)
+        'erlang': highlighters.erlang,
+    }.get(language, lambda x: x)
 
     views = view_doc.get('views')
 

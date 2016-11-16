@@ -12,3 +12,7 @@ def javascript(code):
 
 def python(code):
     return pygments.highlight(code, lexers.PythonLexer(), formatters.TerminalFormatter())
+
+
+def erlang(code):
+    return pygments.highlight(code, lexers.ErlangLexer(), formatters.TerminalFormatter())
